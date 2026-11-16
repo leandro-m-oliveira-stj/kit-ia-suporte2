@@ -34,6 +34,10 @@
   .prov li { display:grid; gap:0; }
   .prov li span { color:var(--muted); font-size:12px; }
   .prov li code { font-size:12px; overflow-wrap:anywhere; background:none; padding:0; }
+  .prov .cadastrados { font-size:13px; color:var(--muted); display:grid; gap:2px; }
+  .prov .cadastrados div { overflow-wrap:anywhere; }
+  .prov .cadastrados b { color:var(--fg); }
+  .prov .cadastrados code { font-size:12px; background:none; padding:0; }
   .prov .fora { font-size:13px; color:var(--muted); padding-top:6px; border-top:1px solid var(--line); }
   .pill.ok { color:var(--ok); } .pill.bad { color:var(--bad); } .pill.warn { color:var(--warn); }
   .links { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; }
@@ -297,6 +301,8 @@ async function atualizarRobo() {
       `<div class="prov"><strong class="nome">${esc(p.nome)}</strong>` +
       `<div class="estado"><span>Conta</span><span class="pill ${esc(p.conta.cls)}">${esc(p.conta.txt)}</span>` +
       `<span>Limite</span><span class="pill ${esc(p.limite.cls)}">${esc(p.limite.txt)}${p.limite.volta_em ? " até " + quando(p.limite.volta_em) : ""}</span></div>` +
+      (p.cadastrados && p.cadastrados.length ? `<div class="cadastrados"><span>Modelo${p.cadastrados.length > 1 ? "s" : ""} cadastrado${p.cadastrados.length > 1 ? "s" : ""}:</span>` +
+        p.cadastrados.map(m => `<div><b>${esc(m.nome)}</b> <code>${esc(m.id)}</code></div>`).join("") + `</div>` : "") +
       (p.usos.length ? `<ul>${p.usos.map(x => `<li><span>${esc(x.no)}</span><code>${esc(x.modelo)}</code></li>`).join("")}</ul>`
                      : `<span class="fora">Conectado, mas não usado no robô publicado</span>`) + `</div>`).join("")
       || `<p class="ajuda">Nenhuma conta de IA conectada no Dify.</p>`;

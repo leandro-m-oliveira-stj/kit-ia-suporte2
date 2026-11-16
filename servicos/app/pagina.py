@@ -83,9 +83,27 @@ async def entrar_no_dify(h: httpx.AsyncClient) -> dict:
     return {"X-CSRF-Token": h.cookies.get("csrf_token") or h.cookies.get("__Host-csrf_token") or ""}
 
 
+async def _modelos_cadastrados(h: httpx.AsyncClient, cab: dict, provedores: dict) -> None:
+    """Anota em cada provedor os modelos que o usuário cadastrou à mão (os predefinidos do plugin são muitos e ficam de fora)."""
+    try:
+        r = await h.get(URL["dify"] + "/console/api/workspaces/current/models/model-types/llm", headers=cab)
+        r.raise_for_status()
+        for p in r.json()["data"]:
+            id_ = p["provider"].split("/")[1]
+            if id_ not in provedores:
+                continue
+            for m in p.get("models") or []:
+                if m.get("fetch_from") == "customizable-model":
+                    rotulo = m.get("label") or {}
+                    provedores[id_]["cadastrados"].append(
+                        {"nome": rotulo.get("pt_BR") or rotulo.get("en_US") or m["model"], "id": m["model"]})
+    except (ValueError, KeyError, TypeError, IndexError, httpx.HTTPError):
+        pass  # só deixa de mostrar os modelos cadastrados; o resto do cartão continua valendo
+
+
 async def provedores_de_ia() -> dict:
     """Pergunta ao Dify quais contas estão cadastradas e onde o robô publicado usa cada uma (não gasta cota)."""
-    provedores = {id_: {"nome": nome, "conta": None, "usos": []} for id_, nome in PROVEDORES.items()}
+    provedores = {id_: {"nome": nome, "conta": None, "usos": [], "cadastrados": []} for id_, nome in PROVEDORES.items()}
     try:
         async with httpx.AsyncClient(timeout=10) as h:
             cab = await entrar_no_dify(h)
@@ -95,16 +113,17 @@ async def provedores_de_ia() -> dict:
                 p["conta"] = False
             for p in r.json()["data"]:  # langgenius/groq/groq -> groq
                 id_ = p["provider"].split("/")[1]
-                provedores.setdefault(id_, {"nome": id_.capitalize(), "conta": False, "usos": []})
+                provedores.setdefault(id_, {"nome": id_.capitalize(), "conta": False, "usos": [], "cadastrados": []})
                 rotulo = p.get("label") or {}
                 provedores[id_]["nome"] = rotulo.get("pt_BR") or rotulo.get("en_US") or provedores[id_]["nome"]
                 provedores[id_]["conta"] = (p.get("custom_configuration") or {}).get("status") == "active"
+            await _modelos_cadastrados(h, cab, provedores)
             r = await h.get(f"{URL['dify']}/console/api/apps/{ler('dify.json').get('app_id')}/workflows/publish", headers=cab)
             r.raise_for_status()
         for n in r.json()["graph"]["nodes"]:
             if modelo := n["data"].get("model"):
                 id_ = modelo["provider"].split("/")[1]
-                provedores.setdefault(id_, {"nome": id_.capitalize(), "conta": False, "usos": []})
+                provedores.setdefault(id_, {"nome": id_.capitalize(), "conta": False, "usos": [], "cadastrados": []})
                 provedores[id_]["usos"].append({"no": n["data"].get("title", ""), "modelo": modelo["name"]})
     except (OSError, ValueError, KeyError, TypeError, IndexError, httpx.HTTPError):
         pass  # sem o app_id (chave colada à mão) ou Dify ocupado: fica com o que já se sabe
@@ -233,7 +252,7 @@ def situacao_do_robo(robo: dict, provedores: dict, bloqueio: dict) -> dict:
             situacao = ("ok", "sem erro")
         else:
             situacao = ("warn", "sem dados") if usado else ("", "sem dados")
-        cartoes.append({"nome": ia, "usos": p["usos"],
+        cartoes.append({"nome": ia, "usos": p["usos"], "cadastrados": p.get("cadastrados", []),
                         "conta": {"cls": conta[0], "txt": conta[1]},
                         "limite": {"cls": situacao[0], "txt": situacao[1], "volta_em": volta}})
     bloqueado = bool(bloqueio["em"] and bloqueio["em"] > (robo.get("recebida_em") or 0))
