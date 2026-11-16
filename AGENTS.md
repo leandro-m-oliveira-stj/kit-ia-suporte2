@@ -13,6 +13,11 @@ Fluxo:
 3. O Opus revisa. Se houver problema, devolve ao mesmo subagente para corrigir.
 4. Só com a revisão aprovada o código é commitado.
 
+## Git
+
+- Com autorização do usuário, envie direto para a `main` (push, sem pull request nem merge).
+- Sem autorização, trabalhe na branch da sessão e pergunte antes de levar para a `main`.
+
 ## Projeto
 
 - Idioma: português do Brasil em textos, mensagens de commit e comentários.
