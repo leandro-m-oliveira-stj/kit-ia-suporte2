@@ -8,3 +8,8 @@ Dify + Chatwoot + serviços simulados (ouvidoria e consulta de processos), com d
 
 Componentes: Dify 1.17.1 (Dify Open Source License), Chatwoot v4.18.0 (MIT).
 Serviços da pasta `servicos`: criados para a disciplina, uso educacional.
+
+## Desenvolvimento com IA
+
+O código deste repositório é escrito por subagentes **Sonnet** (esforço médio). O **Opus** só coordena e revisa:
+não programa nem roda testes de mutação ou outros testes pesados. Regras completas em [`AGENTS.md`](AGENTS.md).
