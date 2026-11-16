@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Viagem de uma Mensagem</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: diagrama do caminho em cima, painel do passo atual embaixo; mesma linguagem visual do Mapa do Kit */
+:root {
+  --bg: #f4f5f2; --surface: #ffffff; --ink: #1c2229; --muted: #5d6670; --line: #cfd4cd; --dim: #e4e7e2;
+  --accent: #b5532a; --accent-bg: #fbe9e1;
+  --kit: #8a7440; --kit-bg: #f6f1e4; --cw: #2a6fb0; --cw-bg: #e9f1fa;
+  --dify: #5a4fb0; --dify-bg: #eeecfa; --ia: #a8442f; --ia-bg: #fbeeea; --ok: #2f7a4f; --bad: #b3261e;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15191d; --surface: #1d2328; --ink: #e6e9ec; --muted: #9aa4ad; --line: #3a434a; --dim: #262d33;
+  --accent: #e8875c; --accent-bg: #3a2419;
+  --kit: #d4bb7c; --kit-bg: #2a261b; --cw: #7db4e8; --cw-bg: #18263a;
+  --dify: #a99ff0; --dify-bg: #221f38; --ia: #ec9a85; --ia-bg: #33201b; --ok: #7fc99c; --bad: #f0877c;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #15191d; --surface: #1d2328; --ink: #e6e9ec; --muted: #9aa4ad; --line: #3a434a; --dim: #262d33;
+  --accent: #e8875c; --accent-bg: #3a2419;
+  --kit: #d4bb7c; --kit-bg: #2a261b; --cw: #7db4e8; --cw-bg: #18263a;
+  --dify: #a99ff0; --dify-bg: #221f38; --ia: #ec9a85; --ia-bg: #33201b; --ok: #7fc99c; --bad: #f0877c;
+  color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.pagina { max-width: 1100px; margin: 0 auto; padding-block: 26px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 18px; }
+.rotulo { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 4px 0 6px; font-size: clamp(24px, 3.6vw, 32px); line-height: 1.15; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 70ch; }
+
+.cenarios { display: flex; flex-wrap: wrap; gap: 8px; }
+.cenarios button { font: inherit; font-size: 14px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.cenarios button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-bg); font-weight: 600; }
+.cenarios button:focus-visible, .controles button:focus-visible { outline: 3px solid var(--cw); outline-offset: 2px; }
+
+.quadro { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+.quadro svg { display: block; width: 100%; min-width: 900px; height: auto; }
+svg text { font-family: var(--font-body); fill: var(--ink); }
+.n rect { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+.n text.t { font-size: 12.5px; font-weight: 600; } .n text.s { font-size: 11px; fill: var(--muted); }
+.n.g-kit rect { stroke: var(--kit); } .n.g-cw rect { stroke: var(--cw); } .n.g-dify rect { stroke: var(--dify); } .n.g-ia rect { stroke: var(--ia); }
+.n.g-err rect { stroke: var(--bad); stroke-dasharray: 4 3; }
+.n.visto rect { fill: var(--dim); }
+.n.agora rect { fill: var(--accent-bg); stroke: var(--accent); stroke-width: 3; }
+.n.agora text.t { fill: var(--accent); }
+.badge { font-family: var(--font-mono); font-size: 10px; font-weight: 600; fill: var(--ia); }
+.a { fill: none; stroke: var(--line); stroke-width: 1.5; transition: stroke .25s; }
+.a.visto { stroke: var(--muted); stroke-width: 2; }
+.a.agora { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 7 5; animation: fluxo .8s linear infinite; }
+@keyframes fluxo { to { stroke-dashoffset: -12; } }
+@media (prefers-reduced-motion: reduce) { .a.agora { animation: none; stroke-dasharray: none; } .n rect { transition: none; } }
+
+.passo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 18px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+@media (max-width: 760px) { .passo { grid-template-columns: 1fr; } }
+.passo h2 { margin: 2px 0 8px; font-size: 20px; text-wrap: balance; }
+.passo p { margin: 0 0 8px; }
+.onde { font-family: var(--font-mono); font-size: 12px; color: var(--accent); letter-spacing: .04em; }
+.dados { min-width: 0; }
+.dados .rotulo { display: block; margin-bottom: 6px; }
+pre { margin: 0; background: #20262c; color: #e9ecef; border-radius: 8px; padding: 12px 14px; font-family: var(--font-mono);
+  font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 300px; overflow: auto; }
+.custo { display: inline-block; font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 999px; margin-top: 4px; }
+.custo.sim { background: var(--ia-bg); color: var(--ia); } .custo.nao { background: var(--dim); color: var(--muted); }
+.peca { margin-top: 14px; display: grid; gap: 10px; }
+.peca div { border-left: 3px solid var(--line); padding: 2px 0 2px 12px; }
+.peca b { display: block; font-size: 14px; }
+.peca p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.peca .papel { color: var(--ink); }
+.peca .c-kit { border-left-color: var(--kit); } .peca .c-cw { border-left-color: var(--cw); }
+.peca .c-dify { border-left-color: var(--dify); } .peca .c-ia { border-left-color: var(--ia); }
+.tec { margin-top: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; background: var(--bg); }
+.tec summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.tec summary:focus-visible { outline: 3px solid var(--cw); outline-offset: 2px; border-radius: 4px; }
+.tec h4 { margin: 10px 0 2px; font-size: 13px; font-family: var(--font-mono); color: var(--muted); font-weight: 500; }
+.tec ul { margin: 6px 0 2px; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.tec code { font-family: var(--font-mono); font-size: 12.5px; background: var(--dim); padding: 0 4px; border-radius: 4px; overflow-wrap: anywhere; }
+
+.glossario { display: grid; gap: 18px; margin-top: 18px; }
+.g-topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.g-topo h2 { margin: 0; font-size: 22px; }
+.g-topo input { font: inherit; font-size: 14px; padding: 7px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); width: min(260px, 100%); }
+.g-topo input:focus-visible { outline: 3px solid var(--cw); outline-offset: 1px; }
+.g-grupo h3 { margin: 0 0 8px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.g-grupo dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0 28px; }
+.g-item { padding: 9px 0; border-top: 1px solid var(--line); min-width: 0; }
+.g-item dt { font-weight: 600; font-size: 14.5px; }
+.g-item dd { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.g-item code { font-family: var(--font-mono); font-size: 12.5px; background: var(--dim); padding: 0 4px; border-radius: 4px; overflow-wrap: anywhere; color: var(--ink); }
+.g-vazio { color: var(--muted); margin: 0; }
+.controles { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.controles button { font: inherit; font-weight: 600; font-size: 14px; border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer;
+  background: var(--accent); color: var(--surface); }
+.controles button.sec { background: var(--dim); color: var(--ink); }
+.controles button:disabled { opacity: .45; cursor: default; }
+.trilha { display: flex; gap: 5px; flex-wrap: wrap; flex: 1 1 200px; }
+.trilha i { width: 18px; height: 6px; border-radius: 3px; background: var(--line); cursor: pointer; }
+.trilha i.visto { background: var(--muted); } .trilha i.agora { background: var(--accent); }
+.contador { font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dica { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="pagina">
+  <header>
+    <span class="rotulo">Laboratório IA para Centros de Suporte · Chatbot STJ</span>
+    <h1>A viagem de uma mensagem</h1>
+    <p class="lead">Escolha o que o cidadão digita e avance passo a passo. O nó da vez acende no diagrama, e o quadro de baixo mostra o que acontece ali e o que trafega entre as peças. Os textos são os do Bot STJ e do código do kit.</p>
+  </header>
+
+  <div class="cenarios" id="cenarios" role="group" aria-label="Mensagem do cidadão"></div>
+
+  <div class="quadro"><svg id="mapa" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama do caminho da mensagem"></svg></div>
+
+  <div class="controles">
+    <button type="button" class="sec" id="voltar">← Anterior</button>
+    <button type="button" id="avancar">Próximo →</button>
+    <span class="contador" id="contador"></span>
+    <div class="trilha" id="trilha" aria-hidden="true"></div>
+    <span class="dica">Setas ← → do teclado também funcionam</span>
+  </div>
+
+  <div class="passo" aria-live="polite">
+    <div>
+      <span class="onde" id="onde"></span>
+      <h2 id="titulo"></h2>
+      <div id="texto"></div>
+      <span class="custo" id="custo"></span>
+      <div class="peca" id="peca"></div>
+    </div>
+    <div class="dados"><span class="rotulo">O que trafega</span><pre id="dados"></pre>
+      <details class="tec" id="tec" open><summary>Mais detalhes técnicos</summary><div id="tec-corpo"></div></details>
+    </div>
+  </div>
+
+  <section class="glossario" aria-labelledby="g-titulo">
+    <div class="g-topo">
+      <h2 id="g-titulo">Glossário</h2>
+      <input type="search" id="g-busca" placeholder="Buscar termo" aria-label="Buscar no glossário">
+    </div>
+    <div class="g-grupo"><h3>Infraestrutura</h3><dl>
+      <div class="g-item"><dt>Codespaces</dt><dd>Um computador Linux na nuvem do GitHub, criado a partir de um repositório e usado pelo navegador. É onde o kit inteiro roda.</dd></div>
+      <div class="g-item"><dt>Contêiner (container)</dt><dd>Uma “caixa” isolada que roda um programa com tudo de que ele precisa: sistema, bibliotecas e configurações. Vários contêineres rodam na mesma máquina sem um atrapalhar o outro.</dd></div>
+      <div class="g-item"><dt>Docker</dt><dd>A ferramenta que cria e roda os contêineres a partir de imagens, que são os modelos prontos de cada programa.</dd></div>
+      <div class="g-item"><dt>docker compose</dt><dd>Comando do Docker que liga um grupo de contêineres de uma vez, descrito num arquivo <code>docker-compose.yaml</code>. O kit tem um grupo para o Dify, um para o Chatwoot e um para os seus serviços.</dd></div>
+      <div class="g-item"><dt>Porta</dt><dd>Número que identifica um serviço dentro de uma máquina: 8080 é o painel, 3000 o Chatwoot, 8081 o Dify. O Codespaces transforma cada porta num endereço <code>…-8080.app.github.dev</code>.</dd></div>
+      <div class="g-item"><dt>Rede interna</dt><dd>Rede privada entre os contêineres (no kit, <code>kit-rede</code>). Por ela um contêiner chama o outro pelo nome, como <code>http://chatwoot:3000</code>, sem passar pela internet.</dd></div>
+      <div class="g-item"><dt>Volume</dt><dd>Pasta que fica fora do contêiner e sobrevive quando ele é recriado. É onde ficam os bancos de dados e a pasta <code>config/</code>.</dd></div>
+    </dl></div>
+    <div class="g-grupo"><h3>Web e comunicação</h3><dl>
+      <div class="g-item"><dt>API</dt><dd>Uma “porta de entrada” para programas: endereços que outro programa chama para pedir ou enviar dados, em vez de uma pessoa clicar numa tela.</dd></div>
+      <div class="g-item"><dt>Blocking e streaming</dt><dd>Duas formas de receber uma resposta: blocking espera o texto inteiro ficar pronto; streaming vai mostrando aos pedaços. O conector usa blocking.</dd></div>
+      <div class="g-item"><dt>Cookie</dt><dd>Pequeno dado que o site guarda no navegador para reconhecer você na próxima visita. O <code>cw_conversation</code> diz ao Chatwoot qual é a sua conversa.</dd></div>
+      <div class="g-item"><dt>Códigos de status</dt><dd>Número que resume a resposta HTTP: 200/201 deu certo; 400 pedido com problema; 401/403 sem permissão; 404 não encontrado; 422 dado inválido; 429 pedidos demais; 500/503 erro ou serviço indisponível.</dd></div>
+      <div class="g-item"><dt>HTTP</dt><dd>O protocolo da web. Cada pedido tem um método (<code>GET</code> para buscar, <code>POST</code> para enviar) e cada resposta tem um código de status.</dd></div>
+      <div class="g-item"><dt>iframe</dt><dd>Uma página dentro de outra página. O balão do chat é um iframe do Chatwoot dentro do painel.</dd></div>
+      <div class="g-item"><dt>JSON</dt><dd>Formato de texto para trocar dados entre programas, com chaves e valores: <code>{"category_id": "servicos"}</code>.</dd></div>
+      <div class="g-item"><dt>postMessage</dt><dd>Jeito seguro de uma página e um iframe de endereços diferentes trocarem mensagens.</dd></div>
+      <div class="g-item"><dt>Proxy reverso</dt><dd>Um intermediário que recebe os pedidos num endereço e os repassa a outro serviço, devolvendo a resposta como se fosse dele. O painel faz isso com o Chatwoot.</dd></div>
+      <div class="g-item"><dt>SSRF</dt><dd>Ataque em que alguém faz um servidor chamar endereços internos que não deveria. Por isso o Chatwoot bloqueia webhooks para a rede interna, a menos que seja liberado, e o Dify passa as chamadas pelo <code>ssrf_proxy</code>.</dd></div>
+      <div class="g-item"><dt>Timeout</dt><dd>Tempo máximo de espera. Passou disso, o pedido é cancelado. O conector espera até 60 segundos pelo Dify.</dd></div>
+      <div class="g-item"><dt>Token / chave de API</dt><dd>Uma senha para programas. Vai no cabeçalho do pedido (<code>Authorization: Bearer app-…</code>) e diz quem está chamando e o que pode fazer.</dd></div>
+      <div class="g-item"><dt>Webhook</dt><dd>Um aviso automático: quando algo acontece num sistema, ele chama o endereço de outro sistema. O Chatwoot chama o conector a cada mensagem nova.</dd></div>
+      <div class="g-item"><dt>Websocket</dt><dd>Conexão que fica aberta entre o navegador e o servidor, para o servidor mandar novidades na hora, sem a página precisar perguntar. O ActionCable é o websocket do Rails, usado pelo Chatwoot.</dd></div>
+    </dl></div>
+    <div class="g-grupo"><h3>Programas e linguagens</h3><dl>
+      <div class="g-item"><dt>Expressão regular (regex)</dt><dd>Um padrão para procurar texto. O nó “Validar número” usa uma para achar números de processo no formato CNJ.</dd></div>
+      <div class="g-item"><dt>FastAPI</dt><dd>Biblioteca Python para criar APIs e páginas web com pouco código. O painel, o conector e as APIs simuladas são feitos com ela.</dd></div>
+      <div class="g-item"><dt>httpx</dt><dd>Biblioteca Python para fazer pedidos HTTP. É com ela que o conector chama o Dify e o Chatwoot.</dd></div>
+      <div class="g-item"><dt>nginx</dt><dd>Servidor web que fica na frente do Dify e distribui os pedidos entre a API e as telas.</dd></div>
+      <div class="g-item"><dt>Plugin</dt><dd>Peça que se instala no Dify para ele falar com um provedor de IA (Groq, NVIDIA NIM, Gemini).</dd></div>
+      <div class="g-item"><dt>PostgreSQL</dt><dd>Banco de dados onde Chatwoot e Dify guardam conversas, contas, fluxos e a base de conhecimento.</dd></div>
+      <div class="g-item"><dt>Python</dt><dd>Linguagem de programação do painel, do conector, das APIs simuladas e dos nós de código do Dify.</dd></div>
+      <div class="g-item"><dt>Redis</dt><dd>Banco de dados em memória, muito rápido, usado como cache e para as filas de tarefas.</dd></div>
+      <div class="g-item"><dt>Ruby on Rails</dt><dd>Linguagem Ruby com o framework Rails, usados para construir o Chatwoot.</dd></div>
+      <div class="g-item"><dt>Sandbox</dt><dd>Ambiente isolado onde o Dify roda os nós de código, para um código com problema não afetar o resto.</dd></div>
+      <div class="g-item"><dt>Sidekiq</dt><dd>Fila de tarefas do Chatwoot: executa em segundo plano o que não precisa ser na hora, como enviar webhooks.</dd></div>
+      <div class="g-item"><dt>uvicorn</dt><dd>O servidor que roda uma aplicação FastAPI e atende os pedidos HTTP que chegam na porta.</dd></div>
+    </dl></div>
+    <div class="g-grupo"><h3>Inteligência artificial</h3><dl>
+      <div class="g-item"><dt>Alucinação</dt><dd>Quando o modelo inventa algo que parece verdade. Por isso o bot usa respostas fixas, APIs e a instrução de responder só com o contexto.</dd></div>
+      <div class="g-item"><dt>Base de conhecimento</dt><dd>Os documentos que o bot pode consultar. No kit, 5 artigos sobre os serviços do STJ.</dd></div>
+      <div class="g-item"><dt>Busca por palavra-chave</dt><dd>Encontrar trechos que têm as mesmas palavras da pergunta. É o que o kit usa (modo Econômico).</dd></div>
+      <div class="g-item"><dt>Classificador</dt><dd>Uso do modelo para escolher uma categoria entre várias, em vez de escrever texto livre.</dd></div>
+      <div class="g-item"><dt>Embedding</dt><dd>Transformar um texto numa lista de números que representa o significado. Permite a busca semântica, que acha “documento negativo” ao procurar “certidão negativa”. O kit não usa por padrão.</dd></div>
+      <div class="g-item"><dt>Few-shot</dt><dd>Colocar no prompt alguns exemplos prontos de pergunta e resposta, para o modelo imitar o formato. O classificador usa dois.</dd></div>
+      <div class="g-item"><dt>Janela de contexto</dt><dd>Quanto texto o modelo consegue considerar de uma vez. O gpt-oss-120b aceita cerca de 131 mil tokens.</dd></div>
+      <div class="g-item"><dt>LLM (modelo de linguagem)</dt><dd>Programa treinado com muito texto que lê uma instrução e escreve uma continuação. No kit, o gpt-oss-120b classifica a mensagem e redige a resposta.</dd></div>
+      <div class="g-item"><dt>Memória</dt><dd>As últimas mensagens da conversa enviadas junto com a pergunta, para o modelo entender o contexto.</dd></div>
+      <div class="g-item"><dt>Prompt</dt><dd>O texto enviado ao modelo: instruções, exemplos, contexto e a pergunta.</dd></div>
+      <div class="g-item"><dt>Provedor de IA</dt><dd>Empresa que roda os modelos na nuvem e cobra por uso: Groq, NVIDIA NIM, Google Gemini.</dd></div>
+      <div class="g-item"><dt>Raciocínio (reasoning)</dt><dd>Etapa em que alguns modelos “pensam” antes de responder; o <code>reasoning_effort</code> diz quanto. Quando o raciocínio toma o lugar da resposta, o Dify recebe texto vazio.</dd></div>
+      <div class="g-item"><dt>RAG</dt><dd>Retrieval-Augmented Generation: buscar trechos relevantes na base e entregá-los ao modelo junto com a pergunta, para ele responder com base neles. É o ramo “serviços” do Bot STJ.</dd></div>
+      <div class="g-item"><dt>Reranking</dt><dd>Uma segunda ordenação dos resultados da busca, feita por outro modelo, para pôr os mais relevantes no topo. Desligado no kit.</dd></div>
+      <div class="g-item"><dt>Temperatura</dt><dd>Controla a variação das respostas: perto de 0, o modelo escolhe sempre o mais provável; mais alto, fica mais criativo. O kit usa 0.2.</dd></div>
+      <div class="g-item"><dt>Token (de modelo)</dt><dd>Pedaço de texto que o modelo lê ou escreve, mais ou menos uma sílaba ou palavra curta. Cota e preço são contados em tokens.</dd></div>
+      <div class="g-item"><dt>top_k</dt><dd>Quantos trechos a busca devolve. No kit, 2.</dd></div>
+      <div class="g-item"><dt>Índice invertido</dt><dd>Tabela que liga cada palavra aos trechos onde ela aparece, como o índice remissivo de um livro.</dd></div>
+    </dl></div>
+    <p class="g-vazio" id="g-vazio" hidden>Nenhum termo encontrado.</p>
+  </section>
+</div>
+
+<script>
+// ---------- peças do diagrama ----------
+const W = 150, H = 46;
+const NOS = {
+  nav:      {x: 16,  y: 16, w: 140, g: "kit",  t: "Balão do chat", s: "no navegador"},
+  painel:   {x: 186, y: 16, w: 140, g: "kit",  t: "Painel :8080", s: "repassa o chat"},
+  cw:       {x: 356, y: 16, w: 140, g: "cw",   t: "Chatwoot :3000", s: "conversa e webhook"},
+  con:      {x: 526, y: 16, w: 140, g: "kit",  t: "Conector :8000", s: "Chatwoot ↔ Dify"},
+  groq:     {x: 820, y: 16, w: 164, g: "ia",   t: "Groq", s: "openai/gpt-oss-120b"},
+  inicio:   {x: 36,  y: 128, w: 140, g: "dify", t: "Início", s: "sys.query"},
+  pede:     {x: 36,  y: 228, w: 140, g: "dify", t: "Pediu ATENDENTE?", s: "regra: contém a palavra"},
+  respat:   {x: 36,  y: 330, w: 140, g: "dify", t: "Passar a humano", s: "resposta fixa"},
+  classif:  {x: 206, y: 228, w: 160, g: "dify", t: "Classificador", s: "escolhe 1 de 6", ia: true},
+  erro:     {x: 206, y: 330, w: 160, g: "err",  t: "Run failed", s: "o fluxo para com erro"},
+  saud:     {x: 416, y: 112, w: 170, g: "dify", t: "Boas-vindas", s: "saudacao · resposta fixa"},
+  base:     {x: 416, y: 172, w: 170, g: "dify", t: "Base de conhecimento", s: "servicos · palavra-chave, top 2"},
+  llm:      {x: 606, y: 172, w: 170, g: "dify", t: "Redigir resposta", s: "só com os artigos", ia: true},
+  respllm:  {x: 796, y: 172, w: 170, g: "dify", t: "Resposta da base", s: "{{#llm.text#}}"},
+  valida:   {x: 416, y: 232, w: 170, g: "dify", t: "Validar número", s: "processos · código"},
+  trib:     {x: 606, y: 232, w: 170, g: "kit",  t: "API do tribunal", s: "HTTP :8200"},
+  monta:    {x: 796, y: 232, w: 170, g: "dify", t: "Montar resposta", s: "código, sem IA"},
+  tipo:     {x: 416, y: 292, w: 170, g: "dify", t: "Tipo da manifestação", s: "ouvidoria · código"},
+  ouvapi:   {x: 606, y: 292, w: 170, g: "kit",  t: "API da ouvidoria", s: "HTTP :8100"},
+  proto:    {x: 796, y: 292, w: 170, g: "dify", t: "Protocolo", s: "código"},
+  aten2:    {x: 416, y: 352, w: 170, g: "dify", t: "Passar a humano", s: "atendente · resposta fixa"},
+  fora:     {x: 416, y: 412, w: 170, g: "dify", t: "Recusa fixa", s: "fora · resposta fixa"},
+};
+const meio = (n, lado) => { const o = NOS[n], h = H;
+  return {d: [o.x + o.w, o.y + h / 2], e: [o.x, o.y + h / 2], b: [o.x + o.w / 2, o.y + h], c: [o.x + o.w / 2, o.y]}[lado]; };
+const reta = (a, la, b, lb) => { const [x1, y1] = meio(a, la), [x2, y2] = meio(b, lb);
+  if (x1 === x2 || y1 === y2) return `M${x1} ${y1} L${x2} ${y2}`;
+  if (la === "d") { const xm = (x1 + x2) / 2; return `M${x1} ${y1} H${xm} V${y2} H${x2}`; }
+  return `M${x1} ${y1} V${y2} H${x2}`; };
+const ramo = (b) => { const [x1, y1] = meio("classif", "d"), [x2, y2] = meio(b, "e"); return `M${x1} ${y1} H396 V${y2} H${x2}`; };
+const ARESTAS = {
+  "nav-painel": reta("nav", "d", "painel", "e"), "painel-cw": reta("painel", "d", "cw", "e"), "cw-con": reta("cw", "d", "con", "e"),
+  "con-inicio": "M560 62 V88 H106 V128",
+  "inicio-pede": reta("inicio", "b", "pede", "c"), "pede-respat": reta("pede", "b", "respat", "c"), "pede-classif": reta("pede", "d", "classif", "e"),
+  "classif-groq": "M330 228 V98 H860 V62", "llm-groq": "M691 172 V150 H972 V62",
+  "classif-erro": reta("classif", "b", "erro", "c"),
+  "classif-saud": ramo("saud"), "classif-base": ramo("base"), "classif-valida": ramo("valida"), "classif-tipo": ramo("tipo"),
+  "classif-aten2": ramo("aten2"), "classif-fora": ramo("fora"),
+  "base-llm": reta("base", "d", "llm", "e"), "llm-respllm": reta("llm", "d", "respllm", "e"),
+  "valida-trib": reta("valida", "d", "trib", "e"), "trib-monta": reta("trib", "d", "monta", "e"),
+  "tipo-ouvapi": reta("tipo", "d", "ouvapi", "e"), "ouvapi-proto": reta("ouvapi", "d", "proto", "e"),
+};
+
+// ---------- passos comuns ----------
+const ida = (msg) => [
+  {n: ["nav"], onde: "Navegador", t: "O cidadão manda a mensagem",
+   d: `<p>No balão do chat, ele digita e envia. O balão é uma página do Chatwoot dentro do painel.</p>`, ia: false,
+   x: `"${msg}"`},
+  {n: ["painel"], e: ["nav-painel"], onde: "Painel do kit · :8080", t: "O painel repassa ao Chatwoot",
+   d: `<p>O balão é servido pelo próprio endereço do painel, que encaminha tudo para o Chatwoot pela rede interna. Assim o aviso de porta do Codespaces não atrapalha.</p>`, ia: false,
+   x: `POST /api/v1/widget/messages?website_token=…\nX-Auth-Token: (sessão do cidadão)\n\n{"message": {"content": "${msg}"}}`},
+  {n: ["cw"], e: ["painel-cw"], onde: "Chatwoot · :3000", t: "O Chatwoot grava e chama o bot",
+   d: `<p>A mensagem entra numa conversa da caixa “Chat on-line”. A conversa está <b>pendente</b>, ou seja, com o bot. Por isso o Chatwoot dispara o webhook do agente-bot.</p>`, ia: false,
+   x: `POST http://conector:8000/webhook\n{\n  "event": "message_created",\n  "message_type": "incoming",\n  "content": "${msg}",\n  "conversation": {"id": 42, "status": "pending"}\n}`},
+  {n: ["con"], e: ["cw-con"], onde: "Conector · :8000", t: "O conector responde rápido e pergunta ao Dify",
+   d: `<p>O Chatwoot só espera 5 segundos pelo webhook. O conector responde “ok” na hora e faz o trabalho em segundo plano: pega a chave em <code>config/dify.json</code> e pergunta ao Dify.</p>`, ia: false,
+   x: `POST http://dify/v1/chat-messages\nAuthorization: Bearer app-…\n\n{\n  "query": "${msg}",\n  "response_mode": "blocking",\n  "conversation_id": "(o da conversa 42, se houver)",\n  "user": "chatwoot-42"\n}`},
+  {n: ["inicio"], e: ["con-inicio"], onde: "Dify · Bot STJ", t: "Começa o fluxo Bot STJ",
+   d: `<p>O texto vira a variável <code>sys.query</code>, que todos os nós podem ler.</p>`, ia: false,
+   x: `sys.query = "${msg}"`},
+];
+const pergunta = (msg, sim) => ({n: ["pede"], e: ["inicio-pede"], onde: "Dify · nó if-else", t: "Pediu ATENDENTE?",
+  d: `<p>Uma regra simples, sem IA: o texto contém “ATENDENTE” ou “atendente”? ${sim ? "<b>Sim</b>: vai direto para um humano." : "<b>Não</b>: segue para o classificador."}</p>`, ia: false,
+  x: `sys.query contém "ATENDENTE"  ou  contém "atendente"\n→ ${sim ? "verdadeiro" : "falso"}`});
+const classifica = (msg, cat, nome) => [
+  {n: ["classif", "groq"], e: ["pede-classif", "classif-groq"], onde: "Dify · Classificador de escopo → Groq", t: "O classificador pergunta ao modelo",
+   d: `<p>O Dify monta uma instrução (“você é um motor de classificação… responda só com JSON”), dois exemplos e a lista das 6 categorias, e manda ao modelo.</p>`, ia: true,
+   x: `{"input_text": ["${msg}"],\n "categories": [\n  {"category_id": "saudacao", …},\n  {"category_id": "processos", …},\n  {"category_id": "servicos", …},\n  {"category_id": "ouvidoria", …},\n  {"category_id": "atendente", …},\n  {"category_id": "fora", …}],\n "classification_instructions": ["Classifique a mensagem de um usuário do atendimento do STJ. Na dúvida…"]}`},
+  {n: ["classif"], e: [], tec: "classif_resp", onde: "Groq → Dify", t: `O modelo escolhe: ${nome}`,
+   d: `<p>O modelo devolve um JSON. O Dify procura o bloco JSON na resposta, lê o <code>category_id</code> e segue pelo ramo dessa categoria.</p>`, ia: false,
+   x: '```json\n{"keywords": [...],\n "category_id": "' + cat + '",\n "category_name": "' + nome + '"}\n```'},
+];
+const volta = (resposta, transfere) => [
+  {n: ["con"], e: ["con-inicio"], tec: "con_volta", onde: "Dify → Conector", t: "O conector recebe a resposta",
+   d: transfere
+     ? `<p>A resposta termina com <code>[ATENDENTE]</code>. O conector tira a marca do texto, publica a mensagem e muda a conversa para <b>Aberta</b>. Daí em diante, as mensagens vão para a fila humana, e não mais para o bot.</p>`
+     : `<p>Sem a marca <code>[ATENDENTE]</code>: o conector só publica a resposta na conversa. A conversa continua com o bot.</p>`, ia: false,
+   x: `POST /api/v1/accounts/1/conversations/42/messages\n{"content": "${resposta.replace(/"/g, '\\"').replace(/\n/g, "\\n").slice(0, 160)}…",\n "message_type": "outgoing"}` +
+      (transfere ? `\n\nPOST /api/v1/accounts/1/conversations/42/toggle_status\n{"status": "open"}` : "")},
+  {n: ["cw"], e: ["cw-con"], tec: "cw_volta", onde: "Chatwoot", t: transfere ? "A conversa vai para os atendentes" : "O Chatwoot guarda a resposta",
+   d: transfere
+     ? `<p>A conversa aparece como <b>Aberta</b> no painel dos atendentes do Chatwoot, com todo o histórico. Para voltar a falar com o bot, o cidadão começa uma conversa nova (botão Nova conversa do painel).</p>`
+     : `<p>A resposta fica gravada na conversa, assinada pela Lia, o agente-bot.</p>`, ia: false,
+   x: transfere ? `conversa 42: status "pending" → "open"\n(o webhook do bot não dispara mais nela)` : `conversa 42: status continua "pending"`},
+  {n: ["nav"], e: ["painel-cw", "nav-painel"], tec: "nav_volta", onde: "Websocket /cable → balão", t: "A resposta aparece no balão",
+   d: `<p>O Chatwoot avisa o balão pelo websocket <code>/cable</code>, também repassado pelo painel. A mensagem aparece na hora, sem recarregar.</p>`, ia: false,
+   x: resposta},
+];
+
+// ---------- cenários ----------
+const R = {
+  saud: "Olá! Sou a Lia, assistente virtual do atendimento do STJ (laboratório, dados fictícios).\nPosso ajudar com processos, certidões, acesso aos sistemas, informações e ouvidoria.\nNão dou orientação jurídica. Usamos seus dados só para este atendimento.\nDigite ATENDENTE a qualquer momento para falar com uma pessoa.",
+  recusa: "Posso ajudar apenas com serviços do Superior Tribunal de Justiça: processos, certidões, acesso aos sistemas, informações de atendimento e ouvidoria. Sobre qual desses assuntos você precisa de ajuda?",
+  atend: "Certo! Vou transferir você para um atendente, com o histórico desta conversa. [ATENDENTE]",
+  cert: "1. Envie o pedido por e-mail à Secretaria Judiciária, informando o nome completo da parte.\n2. Diga se quer a certidão só de processos ativos ou de processos ativos e baixados.\n3. Aguarde: o STJ faz a pesquisa e envia a certidão para o seu e-mail.\n4. Se precisar, valide a autenticidade da certidão no portal do STJ.\n\nAtenção: a certidão não é emitida a partir do CPF ou do CNPJ.\nFonte oficial: https://cartadeservicos.stj.jus.br/processos/certidoes/",
+  proc: "Processo 0001234-52.2026.3.00.0000\nClasse: Recurso Especial\nÓrgão: Terceira Turma\nÚltima movimentação: Conclusos ao relator em 10/10/2026",
+  falha: "Tive um problema técnico. Vou transferir você para um atendente.",
+};
+const M = {
+  cert: "como emito uma certidão?", oi: "oi", proc: "qual o andamento do processo 0001234-52.2026.3.00.0000?",
+  pudim: "me passa uma receita de pudim", atend: "quero falar com um ATENDENTE", falha: "como emito uma certidão?",
+};
+const CENARIOS = [
+  {id: "cert", nome: "Como emito uma certidão?", passos: [...ida(M.cert), pergunta(M.cert, false), ...classifica(M.cert, "servicos", "Serviços do tribunal"),
+    {n: ["base"], e: ["classif-base"], onde: "Dify · Base de conhecimento", t: "Busca na base por palavra-chave",
+     d: `<p>Sem IA e sem embedding: o Dify compara as palavras da pergunta com o índice de palavras-chave dos 5 artigos e pega os 2 com mais palavras em comum. Cada artigo é um trecho inteiro.</p>`, ia: false,
+     x: `busca: "como emito uma certidão?"  (keyword_search, top_k = 2)\n\n1. 01-certidao-negativa.md\n   "Como pedir uma certidão negativa (nada consta) no STJ …"\n2. 05-andamento-do-processo.md\n   (segundo colocado; vai junto mesmo sendo fraco: não há nota mínima)`},
+    {n: ["llm", "groq"], e: ["base-llm", "llm-groq"], onde: "Dify · Redigir resposta → Groq", t: "O modelo escreve a resposta",
+     d: `<p>O texto dos 2 artigos entra no lugar de <code>{{#context#}}</code> na instrução da Lia. A instrução manda responder <b>só</b> com o que está no contexto, em até 5 passos, e terminar com a Fonte oficial. O modelo recebe texto, nunca vetores.</p>`, ia: true,
+     x: `[system]\nVocê é a Lia, assistente virtual do atendimento do STJ.\nResponda SOMENTE com o que está escrito no CONTEXTO abaixo…\nSe o CONTEXTO não responder à pergunta, diga exatamente:\n"Não encontrei essa informação. Quer falar com um atendente?"\n\nCONTEXTO:\n# Como pedir uma certidão negativa (nada consta) no STJ …\n\n[user]\ncomo emito uma certidão?`},
+    {n: ["respllm"], e: ["llm-respllm"], onde: "Dify · nó de resposta", t: "O Dify devolve o texto",
+     d: `<p>O nó de resposta pega o texto do modelo (<code>{{#llm.text#}}</code>) e o Dify devolve tudo ao conector numa resposta HTTP.</p>`, ia: false,
+     x: `{"answer": "1. Envie o pedido por e-mail…",\n "conversation_id": "c1a9…",\n "metadata": {"usage": {"total_tokens": 1121}}}`},
+    ...volta(R.cert, false)]},
+  {id: "oi", nome: "oi", passos: [...ida(M.oi), pergunta(M.oi, false), ...classifica(M.oi, "saudacao", "Saudação"),
+    {n: ["saud"], e: ["classif-saud"], onde: "Dify · resposta fixa", t: "Boas-vindas, sem segunda chamada à IA",
+     d: `<p>A saudação é um texto pronto. Nesse ramo, a IA só serviu para classificar: nada de base nem de redação.</p>`, ia: false, x: R.saud},
+    ...volta(R.saud, false)]},
+  {id: "proc", nome: "Andamento de processo", passos: [...ida(M.proc), pergunta(M.proc, false), ...classifica(M.proc, "processos", "Processos"),
+    {n: ["valida"], e: ["classif-valida"], onde: "Dify · nó de código (sandbox)", t: "Confere o número do processo",
+     d: `<p>Um código Python acha o número no padrão CNJ e confere o dígito verificador (módulo 97). Sem número, a pergunta vai para a base; com número inválido, o bot pede correção.</p>`, ia: false,
+     x: `entrada: "${M.proc}"\nachado:  0001234-52.2026.3.00.0000\ndígito:  98 - (base % 97) = 52  ✓\n\n{"valido": "sim", "numero": "0001234-52.2026.3.00.0000"}`},
+    {n: ["trib"], e: ["valida-trib"], onde: "Dify → API do tribunal · :8200", t: "Consulta a API do tribunal",
+     d: `<p>Um nó HTTP chama a API simulada. A resposta vem de um sistema, e não do modelo: o bot não inventa andamento.</p>`, ia: false,
+     x: `GET http://tribunal:8200/processos/0001234-52.2026.3.00.0000\n\n200 OK\n{"numero": "0001234-52.2026.3.00.0000",\n "classe": "Recurso Especial", "orgao": "Terceira Turma",\n "ultima_movimentacao": "Conclusos ao relator", "data": "10/10/2026"}`},
+    {n: ["monta"], e: ["trib-monta"], onde: "Dify · nó de código", t: "Monta a resposta, sem IA",
+     d: `<p>Outro código transforma o JSON em texto. Se o processo for sigiloso ou não existir, a mensagem muda conforme o código HTTP.</p>`, ia: false, x: R.proc},
+    ...volta(R.proc, false)]},
+  {id: "pudim", nome: "Receita de pudim", passos: [...ida(M.pudim), pergunta(M.pudim, false), ...classifica(M.pudim, "fora", "Fora do escopo"),
+    {n: ["fora"], e: ["classif-fora"], onde: "Dify · resposta fixa", t: "Recusa educada e fixa",
+     d: `<p>Assuntos fora do STJ, opinião jurídica e tentativas de mudar as regras recebem sempre o mesmo texto. Não há chance de o modelo “se empolgar” e responder.</p>`, ia: false, x: R.recusa},
+    ...volta(R.recusa, false)]},
+  {id: "atend", nome: "Quero um ATENDENTE", passos: [...ida(M.atend), pergunta(M.atend, true),
+    {n: ["respat"], e: ["pede-respat"], onde: "Dify · resposta fixa", t: "Transferência pedida",
+     d: `<p>Nem passou pelo classificador: a regra pegou a palavra e respondeu com um texto que termina com a marca <code>[ATENDENTE]</code>. Essa marca é o combinado entre o fluxo e o conector.</p>`, ia: false, x: R.atend},
+    ...volta(R.atend.replace(" [ATENDENTE]", ""), true)]},
+  {id: "falha", nome: "Quando o modelo falha", passos: [...ida(M.falha), pergunta(M.falha, false),
+    {n: ["classif", "groq"], e: ["pede-classif", "classif-groq"], onde: "Dify · Classificador → provedor", t: "O classificador pergunta ao modelo",
+     d: `<p>Mesma chamada de sempre. Mas desta vez o modelo está instável (como o Nemotron Ultra) ou foi retirado do provedor (como o qwen3-32b no Groq).</p>`, ia: true,
+     x: `resposta do modelo:\n  content: ""                      ← vazio\n  reasoning_content: "71  /1"       ← texto quebrado\n\nou\n\n  404 model_not_found`},
+    {n: ["erro"], e: ["classif-erro"], onde: "Dify · erro", t: "O fluxo para com erro",
+     d: `<p>O Dify procura um bloco JSON no texto e não acha. A execução inteira falha: a base e a redação nem chegam a rodar. Essa execução aparece como <b>failed</b> nos Logs do Dify e no Diagnóstico do painel.</p>`, ia: false,
+     x: `HTTP 400\n{"code": "completion_request_error",\n "message": "Run failed: could not find json block in the output."}`},
+    {n: ["con"], e: ["con-inicio"], tec: "con_falha", onde: "Conector", t: "O conector usa o plano B",
+     d: `<p>Ele anota o erro em <code>config/robo.json</code> (é o que o painel mostra), manda uma mensagem de falha e transfere a conversa para um humano. Assim o cidadão nunca fica sem resposta.</p>`, ia: false,
+     x: `config/robo.json\n{"erro": {"tipo": "json", "detalhe": "Run failed: could not find json block…"}}\n\nPOST …/messages      {"content": "${R.falha}"}\nPOST …/toggle_status {"status": "open"}`},
+    {n: ["nav"], e: ["cw-con", "painel-cw", "nav-painel"], tec: "nav_volta", onde: "Balão", t: "O cidadão vê o aviso",
+     d: `<p>As próximas mensagens nessa conversa vão para os atendentes. Depois de trocar o modelo no Dify e publicar, use <b>Nova conversa</b> para voltar a falar com o bot.</p>`, ia: false, x: R.falha}]},
+];
+
+// ---------- desenho ----------
+const svg = document.getElementById("mapa"), NS = "http://www.w3.org/2000/svg";
+const el = (tag, at, pai) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); pai.appendChild(e); return e; };
+el("rect", {x: 16, y: 104, width: 968, height: 380, rx: 10, fill: "var(--dify-bg)", stroke: "var(--dify)", "stroke-width": 1.2, opacity: .55}, svg);
+const tt = el("text", {x: 606, y: 130, "font-size": 12, "font-weight": 700}, svg); tt.textContent = "Dify · fluxo Bot STJ";
+const ga = el("g", {}, svg), gn = el("g", {}, svg);
+const arestas = {}, nos = {};
+for (const [id, d] of Object.entries(ARESTAS)) arestas[id] = el("path", {d, class: "a"}, ga);
+for (const [id, o] of Object.entries(NOS)) {
+  const g = el("g", {class: `n g-${o.g}`}, gn);
+  el("rect", {x: o.x, y: o.y, width: o.w, height: H, rx: 7}, g);
+  const t = el("text", {x: o.x + 10, y: o.y + 19, class: "t"}, g); t.textContent = o.t;
+  const s = el("text", {x: o.x + 10, y: o.y + 36, class: "s"}, g); s.textContent = o.s;
+  if (o.ia) { const b = el("text", {x: o.x + o.w - 10, y: o.y + 19, class: "badge", "text-anchor": "end"}, g); b.textContent = "IA"; }
+  nos[id] = g;
+}
+// rótulos dos ramos
+const rot = el("text", {x: 36, y: 474, "font-size": 11, fill: "var(--muted)", style: "font-family:var(--font-mono)"}, svg);
+rot.textContent = "cada ramo começa com o nome da categoria escolhida pelo classificador";
+
+// ---------- quem é quem ----------
+const PECAS = {
+  nav: {nome: "Balão do chat", tipo: "widget do Chatwoot", cor: "kit",
+    eh: "A janelinha de conversa que o cidadão vê no canto da página. É um pedaço do Chatwoot embutido no site, com uma linha de código.",
+    papel: "Num atendimento real, ficaria no portal do STJ. No laboratório, fica dentro do painel do kit para você testar como se fosse o cidadão."},
+  painel: {nome: "Painel do kit", tipo: "feito para o laboratório", cor: "kit",
+    eh: "Uma página em Python (FastAPI) criada só para este kit. Não existe num atendimento de verdade: é a bancada da aula.",
+    papel: "Mostra se tudo está ligado, hospeda o balão para testes, guarda a chave do Dify e tem o Diagnóstico. Também repassa o chat ao Chatwoot, para o aviso de porta do Codespaces não bloquear o balão."},
+  cw: {nome: "Chatwoot", tipo: "plataforma de atendimento, código aberto", cor: "cw",
+    eh: "Um sistema de central de atendimento, como Zendesk ou Intercom, mas de código aberto. Junta numa caixa de entrada as conversas de vários canais (chat do site, WhatsApp, e-mail) e organiza a fila dos atendentes humanos.",
+    papel: "É a central: guarda cada conversa, chama o bot por webhook enquanto a conversa está com ele e, quando o bot transfere, entrega a conversa aos atendentes com todo o histórico."},
+  con: {nome: "Conector", tipo: "código do kit", cor: "kit",
+    eh: "Um programa pequeno em Python, escrito para o kit. O Chatwoot e o Dify não sabem conversar sozinhos: o conector é a ponte entre os dois.",
+    papel: "Recebe o aviso do Chatwoot, pergunta ao Dify, publica a resposta e, se vier a marca [ATENDENTE] ou um erro, passa a conversa para um humano. Também anota os erros que o painel mostra."},
+  dify: {nome: "Dify", tipo: "plataforma de aplicações com IA, código aberto", cor: "dify",
+    eh: "Uma plataforma para montar aplicações com IA sem programar tudo: fluxos visuais com nós, bases de conhecimento, ligação com vários provedores de modelo e registro de cada execução (os Logs).",
+    papel: "É o cérebro do bot. O fluxo Bot STJ decide o caminho de cada mensagem: regra, classificador, base de conhecimento, redação ou APIs. Trocar de modelo de IA é feito só aqui."},
+  groq: {nome: "Groq (provedor de IA)", tipo: "serviço na internet", cor: "ia",
+    eh: "Uma empresa que roda modelos de linguagem na nuvem e cobra por uso, com uma cota gratuita. O modelo usado, o gpt-oss-120b, é um modelo aberto da OpenAI. NVIDIA NIM e Google Gemini são outros provedores do mesmo tipo.",
+    papel: "É quem lê e escreve texto: classifica a mensagem e redige a resposta a partir dos artigos. Só entra nesses dois nós, e cada chamada gasta cota."},
+  apis: {nome: "APIs do tribunal e da ouvidoria", tipo: "simuladas pelo kit", cor: "kit",
+    eh: "Imitações, com dados fictícios, de sistemas reais de um tribunal: a consulta processual e o registro de reclamações, elogios e sugestões.",
+    papel: "Dão ao bot dados de sistema em vez de texto inventado. O andamento de um processo e o número de protocolo vêm daqui, e não do modelo de IA."},
+};
+const PECA_DO_NO = {nav: "nav", painel: "painel", cw: "cw", con: "con", groq: "groq", trib: "apis", ouvapi: "apis"};
+const pecaDe = (no) => PECA_DO_NO[no] || "dify";
+
+
+// ---------- mais detalhes técnicos ----------
+const TEC = {
+  nav: ["O painel consulta <code>/api/status</code> a cada 5 segundos. Quando o Chatwoot responde e já existe o token do chat (<code>website_token</code>, em <code>config/chatwoot.json</code>), ele carrega o script <code>/packs/js/sdk.js</code>.",
+        "O script cria um iframe com <code>/widget?website_token=…</code>: o balão é um app web do Chatwoot dentro dessa moldura. A página e o iframe conversam por <code>postMessage</code>.",
+        "O painel só mostra “Balão do chat pronto” quando o iframe avisa que carregou (evento <code>chatwoot:ready</code>) e o botão do balão existe na página. Se não vier em 20 segundos, ele limpa e tenta de novo a cada 30.",
+        "O cidadão é reconhecido por um cookie <code>cw_conversation</code> com um token. O botão Nova conversa chama <code>window.$chatwoot.reset()</code>, que apaga esse cookie.",
+        "Enviar a mensagem é um <code>POST /api/v1/widget/messages</code>, com o token no cabeçalho <code>X-Auth-Token</code>."],
+  painel: ["Contêiner <code>pagina</code>: Python com FastAPI, servido pelo uvicorn na porta 8080.",
+           "Rotas próprias: <code>/</code>, <code>/api/status</code>, <code>/api/robo</code>, <code>/diagnostico</code> e outras. Qualquer outro caminho cai numa rota “pega-tudo” que repassa a requisição para <code>http://chatwoot:3000</code> com httpx e devolve a resposta: um proxy reverso.",
+           "O websocket <code>/cable</code> é repassado à parte, com a biblioteca websockets. O cabeçalho <code>Origin</code> é trocado pelo endereço interno, porque o Chatwoot só aceita websocket vindo do próprio endereço.",
+           "Por que existe: no Codespaces, o aviso “You are about to access a development port” grava um cookie <code>Partitioned</code>, que só vale na aba em que foi aceito. Um iframe direto da porta 3000 ficava preso nesse aviso, invisível."],
+  cw: ["Chatwoot 4.18, em Ruby on Rails. Contêineres: <code>rails</code> (site, API e websocket), <code>sidekiq</code> (tarefas em fila), <code>postgres</code> (dados) e <code>redis</code> (filas e cache).",
+       "A caixa “Chat on-line” (canal Website) tem o agente-bot “Lia” ligado. Os dois são criados pelo <code>seed_kit.rb</code>, com <code>outgoing_url = http://conector:8000/webhook</code>.",
+       "Conversa nova numa caixa com bot começa como <code>pending</code>. O Chatwoot só manda os eventos ao bot enquanto ela está nesse estado.",
+       "Quem envia o webhook é o sidekiq. O kit liga <code>SAFE_FETCH_ALLOW_PRIVATE_NETWORK=true</code>: sem isso, o Chatwoot recusa mandar webhook para um endereço da rede interna, como proteção contra SSRF."],
+  con: ["Contêiner <code>conector</code>: FastAPI na porta 8000.",
+        "Filtra os eventos: só segue se <code>event = message_created</code>, <code>message_type = incoming</code> e a conversa está <code>pending</code>. Qualquer outro evento recebe <code>{\"ok\": true}</code> e é ignorado.",
+        "Responde ao webhook na hora e faz o resto numa <code>BackgroundTask</code>, porque o Chatwoot espera pouco pela resposta do webhook.",
+        "Guarda em memória qual <code>conversation_id</code> do Dify corresponde a cada conversa do Chatwoot. Se o contêiner reiniciar, a lista some e o Dify começa uma conversa nova, sem o histórico.",
+        "Chama o Dify com httpx, com tempo máximo de 60 segundos, em <code>response_mode: blocking</code>: espera a resposta inteira, sem streaming."],
+  inicio: ["O Bot STJ é um app do tipo <code>advanced-chat</code> (chatflow). A chave <code>app-…</code> identifica o app; a chamada entra pelo <code>nginx</code> do Dify e é atendida pelo contêiner <code>api</code>.",
+           "Variáveis de sistema que todos os nós podem ler: <code>sys.query</code> (o texto), <code>sys.conversation_id</code> e <code>sys.user_id</code> (<code>chatwoot-42</code>).",
+           "Cada mensagem vira uma execução (<em>workflow run</em>) com a entrada, a saída e o tempo de cada nó. É isso que aparece em Logs no Dify e no Diagnóstico do painel."],
+  pede: ["Nó <code>if-else</code> com duas condições ligadas por OU: <code>sys.query</code> contém “ATENDENTE” ou contém “atendente”.",
+         "A comparação diferencia maiúsculas: “Atendente”, com A maiúsculo, não casa aqui. Nesse caso a mensagem vai para o classificador, que costuma escolher a categoria atendente.",
+         "Não custa nada e responde na hora: por isso a regra vem antes da IA."],
+  classif: ["Nó <code>question-classifier</code>. O Dify monta três partes: uma mensagem de sistema (“text classification engine… DO NOT include anything other than the JSON”), dois exemplos prontos de pergunta e resposta (<em>few-shot</em>) e a pergunta no formato <code>{\"input_text\", \"categories\", \"classification_instructions\"}</code>.",
+            "Tem memória das últimas 4 mensagens, então um “e qual o prazo?” é entendido no contexto da conversa.",
+            "Parâmetros que o kit usa: <code>temperature 0.2</code> (pouca variação) e <code>reasoning_effort low</code> (pouco raciocínio, resposta mais rápida).",
+            "A chamada sai pelo contêiner <code>plugin_daemon</code>, que roda o plugin do Groq (<code>langgenius/groq 0.0.20</code>)."],
+  classif_resp: ["Para ler a resposta, o Dify remove os blocos <code>&lt;think&gt;…&lt;/think&gt;</code>, procura o primeiro <code>```json</code> ou <code>{</code> e faz <code>json.loads</code>.",
+                 "Sem nenhum JSON no texto, a execução falha com “could not find json block in the output”.",
+                 "Se o <code>category_id</code> não for nenhuma das 6 categorias, o Dify segue pela primeira da lista, a saudação.",
+                 "O modelo também devolve <code>keywords</code>, mas o fluxo não usa: só o <code>category_id</code> decide o ramo."],
+  groq: ["API compatível com a da OpenAI: <code>POST https://api.groq.com/openai/v1/chat/completions</code>, com a chave <code>gsk_…</code> cadastrada no Dify.",
+         "O Groq roda os modelos em chips próprios (LPU), por isso costuma responder em menos de 1 segundo.",
+         "O plano gratuito tem limite de pedidos e de tokens por minuto e por dia. Passando disso, vem HTTP 429 com “try again in …”.",
+         "<code>gpt-oss-120b</code>: modelo de pesos abertos da OpenAI, com 131 mil tokens de contexto e uma etapa de raciocínio antes da resposta."],
+  saud: ["Nó <code>answer</code> com texto fixo: não chama modelo, não gasta token e responde em milissegundos.", "Para mudar o texto, edite o nó no Dify e clique em Publicar."],
+  fora: ["Nó <code>answer</code> com texto fixo: não chama modelo, não gasta token e responde em milissegundos.",
+         "Recusa fixa é uma escolha de segurança: um texto pronto não pode ser convencido a responder sobre outro assunto, como aconteceria com um modelo."],
+  respat: ["Nó <code>answer</code> com texto fixo, sem modelo.", "O texto termina com <code>[ATENDENTE]</code>. É o combinado entre o fluxo e o conector: ele procura essa marca, tira do texto e transfere a conversa."],
+  aten2: ["Nó <code>answer</code> com texto fixo, sem modelo.", "O texto termina com <code>[ATENDENTE]</code>. É o combinado entre o fluxo e o conector: ele procura essa marca, tira do texto e transfere a conversa."],
+  base: ["Nó <code>knowledge-retrieval</code>, ligado à base “Base STJ – Atendimento”, criada pelo <code>configurar_dify.py</code>.",
+         "Modo de índice Econômico, sem embedding: o Dify extrai palavras-chave de cada trecho (com a biblioteca jieba) e guarda um índice invertido no Postgres.",
+         "Corte dos documentos: separador <code>\\n\\n\\n</code> e até 1024 tokens por trecho. Como os 5 artigos <code>.md</code> são curtos, cada um vira um trecho inteiro.",
+         "<code>top_k 2</code>, sem nota mínima e sem reranking. O resultado vai para a variável <code>result</code>, que o próximo nó usa como contexto."],
+  llm: ["Nó <code>llm</code>. Na instrução, <code>{{#context#}}</code> é trocado pelo texto dos 2 artigos.",
+        "Memória das últimas 6 mensagens: o histórico vai junto, e a pergunta entra como <code>{{#sys.query#}}</code>.",
+        "<code>reasoning_format: separated</code>: o raciocínio do modelo vai para um campo à parte e não aparece no texto da resposta.",
+        "Gasto típico: cerca de 1.100 tokens por resposta. O contexto com os artigos pesa mais que a pergunta."],
+  respllm: ["Nó <code>answer</code> com <code>{{#llm.text#}}</code>.",
+            "No modo blocking, o Dify devolve um JSON com <code>answer</code>, <code>conversation_id</code>, <code>message_id</code> e <code>metadata</code>: o <code>usage</code> traz os tokens gastos e o <code>retriever_resources</code> traz os artigos usados."],
+  valida: ["Nó <code>code</code> em Python, executado no contêiner <code>sandbox</code>, isolado e sem acesso livre à rede.",
+           "Uma expressão regular acha o padrão CNJ <code>NNNNNNN-DD.AAAA.J.TR.OOOO</code>. O dígito é conferido pelo módulo 97: <code>98 − (número sem o dígito, com 00 no fim) mod 97</code>.",
+           "Saídas: <code>valido</code> (sim ou nao) e <code>numero</code> formatado, usadas pelo nó if-else “Número válido?”. Sem número na mensagem, a pergunta vai para a base de conhecimento."],
+  trib: ["Nó <code>http-request</code>: <code>GET http://tribunal:8200/processos/{numero}</code>, com tempo máximo de 30 segundos e sem repetição automática.",
+         "As requisições que o Dify faz saem pelo <code>ssrf_proxy</code> (um Squid), que filtra os destinos.",
+         "A API simulada (FastAPI) aceita até 10 consultas por minuto (depois, 429), exige token Bearer para processo em segredo de justiça e responde 404 ou 422 para processo inexistente ou inválido."],
+  monta: ["Nó <code>code</code>: transforma o JSON da API em texto e escolhe a mensagem pelo código HTTP: 200 (dados do processo), 401 ou 403 (acesso restrito), 404 (não encontrado), 429 (muitas consultas) ou outro (oferece um atendente).",
+          "Como o texto sai só do que a API devolveu, o bot não tem como inventar andamento."],
+  tipo: ["Nó <code>code</code> que decide o tipo por palavras-chave: “denúnc” vira denúncia, “elogi” ou “parabéns” vira elogio, “sugest” ou “sugiro” vira sugestão, e o resto vira reclamação.",
+         "É uma regra simples de propósito: as equipes podem melhorar na aula."],
+  ouvapi: ["Nó <code>http-request</code>: <code>POST http://ouvidoria:8100/manifestacoes</code>, com <code>tipo</code>, <code>texto</code> (a mensagem original) e <code>canal=chat</code> como parâmetros na URL.",
+           "A API simulada grava num arquivo e devolve HTTP 201 com o protocolo (<code>OUV-2026-000123</code>) e o prazo de 30 dias."],
+  proto: ["Nó <code>code</code> que monta a resposta com o protocolo e o prazo da Lei nº 13.460/2017.",
+          "Se a API não devolver 201, a mensagem muda e não mostra protocolo."],
+  erro: ["A execução termina com status <code>failed</code>, e o erro do nó fica guardado: aparece nos Logs do Dify e no Diagnóstico do painel.",
+         "Pela API, o Dify responde HTTP 400 com <code>code: completion_request_error</code> e a mensagem do erro.",
+         "No modo blocking, nada parcial é entregue: o conector recebe só o erro."],
+  con_volta: ["Procura a marca <code>[ATENDENTE]</code> no texto e a remove antes de publicar.",
+              "Publica com <code>POST /api/v1/accounts/{conta}/conversations/{id}/messages</code>, autenticado com o token do bot (<code>api_access_token</code>, guardado em <code>config/chatwoot.json</code>).",
+              "Transferência: <code>POST …/toggle_status</code> com <code>{\"status\": \"open\"}</code>.",
+              "Anota em <code>config/robo.json</code> a hora da última resposta boa e o histórico das últimas 30 perguntas. É o que o painel e o Diagnóstico leem."],
+  cw_volta: ["Estados da conversa: <code>pending</code> (com o bot), <code>open</code> (com humanos) e <code>resolved</code> (encerrada).",
+             "A resposta é gravada como <code>outgoing</code>, com a Lia como remetente. O Chatwoot não manda ao bot as mensagens que o próprio bot escreveu."],
+  nav_volta: ["O Chatwoot transmite o evento <code>message.created</code> pelo ActionCable, o websocket do Rails, no canal do contato, identificado por um <code>pubsub_token</code>.",
+              "O widget recebe o evento e mostra a mensagem. O caminho passa pelo <code>/cable</code> do painel.",
+              "Se o websocket cair, o widget reconecta sozinho e busca as mensagens que faltaram."],
+  con_falha: ["O conector classifica o erro pelo texto: limite (429), sobrecarga, chave do provedor inválida, modelo inexistente, JSON ausente ou outro.",
+              "Em sobrecarga, tenta até 3 vezes com 3 segundos de espera. Em limite que libera em até 20 segundos, espera e repete. Nos outros casos, desiste na hora.",
+              "Grava o tipo e o detalhe do erro em <code>config/robo.json</code>. O painel transforma isso no aviso de “O robô está respondendo?”.",
+              "Manda a mensagem fixa de falha e transfere com <code>toggle_status</code>."],
+};
+const NOME_TEC = {nav: "Balão", painel: "Painel", cw: "Chatwoot", con: "Conector", groq: "Groq", classif: "Classificador"};
+
+// ---------- glossário: busca ----------
+const semAcento = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+document.querySelectorAll(".g-grupo dl").forEach(dl => [...dl.children]
+  .sort((x, y) => semAcento(x.querySelector("dt").textContent).localeCompare(semAcento(y.querySelector("dt").textContent)))
+  .forEach(it => dl.appendChild(it)));
+document.getElementById("g-busca").addEventListener("input", ev => {
+  const q = semAcento(ev.target.value.trim());
+  let algum = false;
+  document.querySelectorAll(".g-grupo").forEach(g => { let n = 0;
+    g.querySelectorAll(".g-item").forEach(it => { const ok = !q || semAcento(it.textContent).includes(q); it.hidden = !ok; if (ok) n++; });
+    g.hidden = !n; if (n) algum = true; });
+  document.getElementById("g-vazio").hidden = algum;
+});
+
+// ---------- estado ----------
+let cen = CENARIOS[0], i = 0;
+const $ = (id) => document.getElementById(id);
+function mostrar() {
+  const passos = cen.passos, p = passos[i];
+  const vistosN = new Set(), vistosE = new Set();
+  passos.slice(0, i).forEach(q => { q.n.forEach(n => vistosN.add(n)); (q.e || []).forEach(e => vistosE.add(e)); });
+  for (const [id, g] of Object.entries(nos)) g.setAttribute("class", `n g-${NOS[id].g}` + (p.n.includes(id) ? " agora" : vistosN.has(id) ? " visto" : ""));
+  for (const [id, a] of Object.entries(arestas)) a.setAttribute("class", "a" + ((p.e || []).includes(id) ? " agora" : vistosE.has(id) ? " visto" : ""));
+  $("onde").textContent = p.onde; $("titulo").textContent = p.t; $("texto").innerHTML = p.d; $("dados").textContent = p.x;
+  $("custo").className = "custo " + (p.ia ? "sim" : "nao"); $("custo").textContent = p.ia ? "chama o modelo de IA · gasta cota" : "sem IA · não gasta cota";
+  const pecas = [...new Set(p.n.map(pecaDe))];
+  $("peca").innerHTML = pecas.map(k => { const q = PECAS[k];
+    return `<div class="c-${q.cor}"><b>${q.nome.startsWith("APIs") ? "O que são as" : "O que é o"} ${q.nome}?</b><p>${q.eh}</p><p class="papel"><b style="display:inline">No kit:</b> ${q.papel}</p></div>`; }).join("");
+  const grupos = p.tec ? [[null, TEC[p.tec]]] : p.n.filter(n => TEC[n]).map(n => [p.n.length > 1 ? (NOME_TEC[n] || NOS[n].t) : null, TEC[n]]);
+  $("tec").hidden = !grupos.length;
+  $("tec-corpo").innerHTML = grupos.map(([nome, itens]) => (nome ? `<h4>${nome}</h4>` : "") + `<ul>${itens.map(x => `<li>${x}</li>`).join("")}</ul>`).join("");
+  $("contador").textContent = `Passo ${i + 1} de ${passos.length}`;
+  $("voltar").disabled = i === 0; $("avancar").disabled = i === passos.length - 1;
+  $("trilha").innerHTML = passos.map((_, k) => `<i class="${k === i ? "agora" : k < i ? "visto" : ""}" data-k="${k}"></i>`).join("");
+}
+$("cenarios").innerHTML = CENARIOS.map(c => `<button type="button" id="c-${c.id}" data-id="${c.id}" aria-pressed="${c === cen}">${c.nome}</button>`).join("");
+$("cenarios").addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return;
+  cen = CENARIOS.find(c => c.id === b.dataset.id); i = 0;
+  document.querySelectorAll("#cenarios button").forEach(x => x.setAttribute("aria-pressed", x === b)); mostrar(); });
+$("avancar").onclick = () => { if (i < cen.passos.length - 1) { i++; mostrar(); } };
+$("voltar").onclick = () => { if (i > 0) { i--; mostrar(); } };
+$("trilha").addEventListener("click", ev => { const k = ev.target.dataset.k; if (k !== undefined) { i = +k; mostrar(); } });
+document.addEventListener("keydown", ev => { if (ev.key === "ArrowRight") $("avancar").click(); if (ev.key === "ArrowLeft") $("voltar").click(); });
+i = 0; mostrar();
+</script>
+
+</body>
+</html>
