@@ -18,6 +18,14 @@ Fluxo:
 - Com autorização do usuário, envie direto para a `main` (push, sem pull request nem merge).
 - Sem autorização, trabalhe na branch da sessão e pergunte antes de levar para a `main`.
 
+## Estilo e Clean Code
+
+- **Clareza acima de esperteza:** Escreva código legível, idiomático e com nomes que revelem intenção. Siga os padrões já existentes no repositório.
+- **Funções pequenas e coesas:** Cada função/método deve ter uma única responsabilidade. Prefira *early returns* (cláusulas de guarda) para evitar aninhamento excessivo.
+- **YAGNI e KISS:** Não crie abstrações prematuras, *wrappers* desnecessários ou flexibilidade especulativa. Resolva o problema de forma direta.
+- **Tratamento de erros explícito:** Valide entradas nas fronteiras e falhe rápido com contexto claro. Nunca silencie exceções.
+- **Comentários úteis:** Comente apenas o *porquê* de decisões não óbvias, nunca *o quê* o código faz. Não deixe código morto, imports não usados ou logs de debug.
+
 ## Projeto
 
 - Idioma: português do Brasil em textos, mensagens de commit e comentários.
