@@ -16,7 +16,8 @@ Fluxo:
 ## Git
 
 - Com autorização do usuário, envie direto para a `main` (push, sem pull request nem merge).
-- Sem autorização, trabalhe na branch da sessão e pergunte antes de levar para a `main`.
+- Mudanças simples (texto, documentação, ajuste pequeno e revisado no painel) podem ir para a `main` sem perguntar.
+- Nas demais, trabalhe na branch da sessão e pergunte antes de levar para a `main`.
 
 ## Estilo e Clean Code
 
