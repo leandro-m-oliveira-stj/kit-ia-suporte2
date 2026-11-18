@@ -58,7 +58,26 @@ svg text { font-family: var(--font-body); fill: var(--ink); }
 .a.visto { stroke: var(--muted); stroke-width: 2; }
 .a.agora { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 7 5; animation: fluxo .8s linear infinite; }
 @keyframes fluxo { to { stroke-dashoffset: -12; } }
-@media (prefers-reduced-motion: reduce) { .a.agora { animation: none; stroke-dasharray: none; } .n rect { transition: none; } }
+/* Indícios de clique: hover/foco e um pulso que some na primeira interação (classe .convite no body). */
+.cenarios button, .controles button, .trilha i, .tec summary { transition: transform .15s, border-color .15s, background-color .15s, box-shadow .15s; }
+.cenarios button:hover { border-color: var(--accent); background: var(--accent-bg); transform: translateY(-1px); box-shadow: 0 2px 6px var(--line); }
+.controles button:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 3px 8px var(--line); }
+.controles button.sec:not(:disabled):hover { background: var(--line); }
+.controles button:not(:disabled):active, .cenarios button:active { transform: translateY(0); }
+.trilha i { transition: transform .15s, background-color .15s; }
+.trilha i:hover { transform: scale(1.35, 1.8); background: var(--accent); }
+.trilha i:focus-visible { outline: 3px solid var(--cw); outline-offset: 2px; }
+.tec summary { list-style: none; display: flex; align-items: center; gap: 8px; border-radius: 4px; padding: 2px 4px; margin: -2px -4px; }
+.tec summary::-webkit-details-marker { display: none; }
+.tec summary::before { content: "▸"; display: inline-block; color: var(--accent); transition: transform .2s; }
+.tec[open] > summary::before { transform: rotate(90deg); }
+.tec summary:hover { background: var(--accent-bg); color: var(--accent); }
+@keyframes pulso { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 10px transparent; } }
+.convite #avancar:not(:disabled), .convite .cenarios button[aria-pressed="true"] { animation: pulso 1.8s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .a.agora { animation: none; stroke-dasharray: none; } .n rect { transition: none; }
+  .convite #avancar, .convite .cenarios button[aria-pressed="true"] { animation: none; }
+  .cenarios button, .controles button, .trilha i, .tec summary, .tec summary::before { transition: none; transform: none !important; } }
 
 .passo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 18px; background: var(--surface);
   border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
@@ -110,7 +129,7 @@ pre { margin: 0; background: #20262c; color: #e9ecef; border-radius: 8px; paddin
 .dica { font-size: 13px; color: var(--muted); }
 </style>
 </head>
-<body>
+<body class="convite">
 
 <div class="pagina">
   <header>
@@ -543,6 +562,10 @@ $("avancar").onclick = () => { if (i < cen.passos.length - 1) { i++; mostrar(); 
 $("voltar").onclick = () => { if (i > 0) { i--; mostrar(); } };
 $("trilha").addEventListener("click", ev => { const k = ev.target.dataset.k; if (k !== undefined) { i = +k; mostrar(); } });
 document.addEventListener("keydown", ev => { if (ev.key === "ArrowRight") $("avancar").click(); if (ev.key === "ArrowLeft") $("voltar").click(); });
+// O pulso de "clique aqui" some na primeira interação.
+const apagarConvite = () => document.body.classList.remove("convite");
+document.addEventListener("click", ev => { if (ev.target.closest("#cenarios button, .controles button, #trilha i")) apagarConvite(); });
+document.addEventListener("keydown", ev => { if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") apagarConvite(); });
 i = 0; mostrar();
 </script>
 
