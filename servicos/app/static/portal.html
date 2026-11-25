@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portal do Cidadão – laboratório</title>
 <style>
-  :root{--ink:#22262b;--muted:#5b6168;--line:#d9d2c3;--soft:#f3efe7;--brand:#404348;--accent:#9e8954;--red:#c62828}
+  :root{--ink:#22262b;--muted:#4a5560;--line:#d9e3e9;--soft:#e6ecf0;--brand:#004164;--accent:#f5af00;--red:#b2101d;--ok:#1f5836;--hover:#427591}
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.5}
   a{color:var(--brand)}
@@ -49,10 +49,27 @@
   .card.servico{border-top:4px solid var(--accent)}
   .card.servico p{margin:0}
   button.acao{align-self:flex-start;background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;letter-spacing:.4px;cursor:pointer}
-  button.acao:hover{filter:brightness(1.2)}
-  button.acao[disabled]{background:#e6e2d8;color:#5b6168;cursor:not-allowed;filter:none}
+  button.acao:hover{background:var(--hover)}
+  button.acao[disabled]{background:#fff;border:1px solid var(--line);color:var(--muted);cursor:not-allowed}
   #avisoChat{margin:18px 0 0;font-size:14px;font-weight:600;color:#8a4b00;min-height:1.4em}
-  .config{border:2px dashed var(--accent);border-radius:12px;padding:18px;margin:40px 0;background:#fffdf8}
+  .chips{display:grid;grid-template-columns:1fr;gap:12px}
+  @media (min-width:640px){.chips{grid-template-columns:repeat(2,1fr)}}
+  @media (min-width:1000px){.chips{grid-template-columns:repeat(4,1fr)}}
+  .chip{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .chip small{color:var(--muted);font-size:13px;order:-1;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  button.copiar{font-family:inherit;background:var(--soft);color:var(--brand);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px;font-weight:600;text-align:left;cursor:pointer}
+  button.copiar:hover{background:var(--brand);color:#fff}
+  .tabela{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--soft);color:var(--brand);font-size:14px}
+  tr:last-child td{border-bottom:0}
+  td .copiar{margin-left:8px;padding:4px 10px;font-size:13px}
+  td .num{white-space:nowrap;font-weight:600}
+  details{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px;background:#fff}
+  summary{cursor:pointer;font-weight:700;color:var(--brand)}
+  details ul{margin:10px 0 0;padding-left:20px;color:var(--ink)}
+  .config{border:2px dashed var(--accent);border-radius:12px;padding:18px;margin:40px 0;background:#fef7e6}
   .config h2{font-size:18px;color:var(--ink)}
   .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px;margin:8px 0 6px}
   .campos label{font-size:14px;font-weight:600;color:var(--brand);display:block}
@@ -60,7 +77,7 @@
   .campos input[type=color]{width:64px;height:38px;border:1px solid var(--line);border-radius:8px;margin-top:4px;padding:2px;background:#fff}
   .config button{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
   .config button.sec{background:#fff;color:var(--brand);border:1px solid var(--line);margin-left:8px}
-  #status{margin-top:10px;font-weight:600;font-size:15px;color:#2e7d32}
+  #status{margin-top:10px;font-weight:600;font-size:15px;color:var(--ok)}
   footer{background:var(--brand);color:#fff;font-size:13px;padding:18px 0}
   footer p{margin:0 0 6px}
   footer a{color:#fff}
@@ -98,6 +115,22 @@
   <div class="wrap">
     <p id="avisoChat" role="status"></p>
 
+    <section id="experimente" aria-labelledby="t-exp">
+      <h2 id="t-exp">Experimente perguntar</h2>
+      <p class="intro">Clique numa frase: ela é copiada e o chat abre. Cole no chat (Ctrl+V) e veja o caminho que o bot segue.</p>
+      <div class="chips">
+        <div class="chip"><small>Saudação</small><button type="button" class="copiar" data-copiar="oi">oi</button></div>
+        <div class="chip"><small>Base de conhecimento</small><button type="button" class="copiar" data-copiar="como emito uma certidão negativa?">como emito uma certidão negativa?</button></div>
+        <div class="chip"><small>Base de conhecimento</small><button type="button" class="copiar" data-copiar="que horas abre o atendimento?">que horas abre o atendimento?</button></div>
+        <div class="chip"><small>Base de conhecimento</small><button type="button" class="copiar" data-copiar="esqueci a senha do peticionamento">esqueci a senha do peticionamento</button></div>
+        <div class="chip"><small>Ouvidoria</small><button type="button" class="copiar" data-copiar="quero fazer uma reclamação sobre o atendimento">quero fazer uma reclamação sobre o atendimento</button></div>
+        <div class="chip"><small>API do tribunal</small><button type="button" class="copiar" data-copiar="qual o andamento do processo 0001234-52.2026.3.00.0000?">qual o andamento do processo 0001234-52.2026.3.00.0000?</button></div>
+        <div class="chip"><small>Recusa: fora do escopo</small><button type="button" class="copiar" data-copiar="vou ganhar meu recurso?">vou ganhar meu recurso?</button></div>
+        <div class="chip"><small>Atendente (vai para uma pessoa)</small><button type="button" class="copiar" data-copiar="ATENDENTE">ATENDENTE</button></div>
+      </div>
+      <p id="avisoCopia" role="status" class="intro"></p>
+    </section>
+
     <section id="canais" aria-labelledby="t-canais">
       <h2 id="t-canais">Como falar com a Central de Atendimento</h2>
       <p class="intro">Escolha o canal mais adequado para sua situação.</p>
@@ -129,9 +162,8 @@
           <p>Seu registro ajuda a melhorar o atendimento.</p>
           <p class="voce">Você pode:</p>
           <ul>
-            <li>fazer reclamações e denúncias;</li>
-            <li>enviar elogios;</li>
-            <li>dar sugestões.</li>
+            <li>registrar reclamação, denúncia, elogio, sugestão ou solicitação;</li>
+            <li>receber um número de protocolo (formato OUV-ano-número) com o prazo de resposta.</li>
           </ul>
           <button type="button" class="acao abrir-chat">REGISTRAR NA OUVIDORIA</button>
         </article>
@@ -168,11 +200,36 @@
       </div>
     </section>
 
+    <section id="processos" aria-labelledby="t-proc">
+      <h2 id="t-proc">Processos fictícios para testar</h2>
+      <p class="intro">Use estes números na pergunta sobre andamento. Todos são inventados.</p>
+      <div class="tabela" role="region" aria-label="Processos fictícios" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">Número</th><th scope="col">Classe</th><th scope="col">Órgão</th><th scope="col">Última movimentação</th><th scope="col">Data</th></tr></thead>
+          <tbody>
+          <tr><td><span class="num">0001234-52.2026.3.00.0000</span><button type="button" class="copiar" data-copiar="0001234-52.2026.3.00.0000">Copiar</button></td><td>Recurso Especial</td><td>Terceira Turma</td><td>Conclusos ao relator</td><td>10/10/2026</td></tr>
+          <tr><td><span class="num">0004321-50.2025.3.00.0000</span><button type="button" class="copiar" data-copiar="0004321-50.2025.3.00.0000">Copiar</button></td><td>Agravo em Recurso Especial</td><td>Primeira Turma</td><td>Publicado acórdão</td><td>02/10/2026</td></tr>
+          <tr><td><span class="num">0007777-71.2026.3.00.0000</span><button type="button" class="copiar" data-copiar="0007777-71.2026.3.00.0000">Copiar</button></td><td>Recurso Especial (segredo de justiça)</td><td>Quarta Turma</td><td>Acesso restrito: o bot não mostra os dados</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="faq" aria-labelledby="t-faq">
+      <h2 id="t-faq">Perguntas frequentes</h2>
+      <p class="intro">São os mesmos artigos que a assistente consulta.</p>
+      <details><summary>Como pedir uma certidão negativa (nada consta)</summary><ul><li>O pedido é feito por e-mail à Secretaria Judiciária do tribunal, e o serviço é gratuito.</li><li>Informe o nome completo da parte e se quer só processos ativos ou ativos e baixados.</li><li>A certidão não é emitida a partir do CPF ou do CNPJ.</li><li>Para processo em segredo de justiça, envie cópia do documento de identidade da parte ou do advogado.</li></ul></details>
+      <details><summary>Horário de atendimento</summary><ul><li>Expediente para o público externo: segunda a sexta, das 11h às 19h.</li><li>Atendimento judicial (telefone, e-mail, Balcão Virtual e Espaço do Advogado): segunda a sexta, das 10h às 19h.</li><li>Sábados, domingos e feriados: plantão judiciário apenas para casos urgentes.</li><li>Recesso forense: de 20 de dezembro a 6 de janeiro.</li></ul></details>
+      <details><summary>Esqueci a senha da Central do Processo Eletrônico (CPE)</summary><ul><li>Na tela de acesso, clique em "Esqueceu a senha?" e siga as instruções enviadas ao seu e-mail.</li><li>Se não conseguir, procure o atendimento judicial por telefone ou pelo Balcão Virtual.</li><li>Peça ajuda imediatamente se o prazo vence hoje ou se a conta bloqueou após várias tentativas.</li></ul></details>
+      <details><summary>Como falar com a Ouvidoria</summary><ul><li>A Ouvidoria recebe reclamações, denúncias, elogios e sugestões sobre os serviços do tribunal.</li><li>O contato é por telefone ou pelo formulário eletrônico.</li><li>Ela não analisa o mérito de processos e não substitui recursos.</li></ul></details>
+      <details><summary>Como acompanhar o andamento de um processo</summary><ul><li>Use a Consulta Processual e pesquise pelo número do processo, pelo número de registro ou pelo nome da parte.</li><li>Ali você vê as fases e a última movimentação.</li><li>O atendimento não informa previsão de julgamento nem opina sobre o resultado.</li></ul></details>
+    </section>
+
     <section class="config" id="config" aria-labelledby="t-cara">
       <h2 id="t-cara">⚙️ A cara do portal do grupo</h2>
       <div class="campos">
         <div><label for="grupo">Nome do grupo</label><input type="text" id="grupo" maxlength="40" placeholder="Ex.: Grupo 3 – Atendimento Ágil"></div>
-        <div><label for="cor">Cor principal</label><input type="color" id="cor" value="#404348"></div>
+        <div><label for="cor">Cor principal</label><input type="color" id="cor" value="#004164"></div>
         <div><label for="botao">Texto do botão do chat</label><input type="text" id="botao" maxlength="30" placeholder="Fale com a assistente"></div>
       </div>
       <button type="button" id="aplicar">Aplicar a cara do grupo</button>
@@ -220,7 +277,7 @@
   };
   $("limpar").onclick = function () {
     try { localStorage.removeItem(CV); } catch (e) { /* sem armazenamento, nada a apagar */ }
-    aplicar({}); $("grupo").value = ""; $("botao").value = ""; $("cor").value = "#404348";
+    aplicar({}); $("grupo").value = ""; $("botao").value = ""; $("cor").value = "#004164";
     msg("Cara do grupo apagada.");
   };
   aplicar(lerVisual());
@@ -231,6 +288,23 @@
   document.querySelectorAll(".abrir-chat").forEach(b => b.addEventListener("click", () => {
     if (window.$chatwoot && window.$chatwoot.hasLoaded) { aviso(""); window.$chatwoot.toggle("open"); }
     else aviso("O chat ainda não está pronto. Aguarde alguns segundos e tente de novo.");
+  }));
+
+  function copiarTexto(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+    return new Promise((ok, falha) => {  // sem HTTPS a API moderna não existe: usa o método antigo
+      const a = document.createElement("textarea");
+      a.value = t; a.style.position = "fixed"; a.style.opacity = "0";
+      document.body.appendChild(a); a.select();
+      try { document.execCommand("copy") ? ok() : falha(); } catch (e) { falha(e); } finally { a.remove(); }
+    });
+  }
+  document.querySelectorAll("[data-copiar]").forEach(b => b.addEventListener("click", async () => {
+    const t = b.dataset.copiar;
+    let copiou = true;
+    try { await copiarTexto(t); } catch (e) { copiou = false; }
+    $("avisoCopia").textContent = copiou ? "Copiado: cole no chat (Ctrl+V)." : "Não consegui copiar: selecione e copie a frase à mão.";
+    if (window.$chatwoot && window.$chatwoot.hasLoaded) window.$chatwoot.toggle("open");
   }));
 
   function chatIndisponivel() { aviso("O chat ainda não está pronto; volte ao painel do kit e confira se tudo está ligado."); }
