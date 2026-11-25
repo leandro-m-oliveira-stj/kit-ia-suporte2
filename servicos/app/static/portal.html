@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal do Cidadão – laboratório</title>
+<style>
+  :root{--ink:#22262b;--muted:#5b6168;--line:#d9d2c3;--soft:#f3efe7;--brand:#404348;--accent:#9e8954;--red:#c62828}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.5}
+  a{color:var(--brand)}
+  :focus-visible{outline:3px solid #2b6cb0;outline-offset:2px}
+  .aviso{background:var(--red);color:#fff;text-align:center;font-weight:700;padding:8px 16px;font-size:14px;letter-spacing:.3px}
+  header{background:var(--brand);color:#fff}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  .top{display:flex;align-items:center;gap:14px;padding-top:18px;padding-bottom:18px}
+  .selo{flex:none;width:46px;height:46px;border-radius:50%;border:3px solid var(--accent);display:grid;place-items:center;font-weight:800;color:var(--accent);font-size:15px}
+  .nome b{display:block;font-size:20px}.nome span{font-size:13px;opacity:.85}
+  nav{border-top:1px solid rgba(255,255,255,.15)}
+  nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;column-gap:20px}
+  nav a{color:#fff;text-decoration:none;display:inline-block;padding:12px 0;font-size:15px}
+  nav a:hover{text-decoration:underline}
+  .hero{background:var(--soft);border-bottom:1px solid var(--line)}
+  .hero .wrap{padding:36px 20px}
+  .trilha{font-size:14px;color:var(--muted);margin:0 0 14px}
+  .trilha a{color:var(--muted)}
+  h1{margin:0 0 10px;font-size:34px;line-height:1.2}
+  .hero p.sub{margin:0;color:var(--muted);font-size:18px;max-width:640px}
+  .dica{margin-top:18px;display:inline-block;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:15px}
+  main section{padding:32px 0 0}
+  h2{margin:0 0 4px;font-size:24px;color:var(--brand)}
+  .intro{margin:0 0 16px;color:var(--muted)}
+  .grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+  .grade.canais{grid-template-columns:1fr}
+  @media (min-width:640px){.grade.canais{grid-template-columns:repeat(2,1fr)}}
+  @media (min-width:1000px){.grade.canais{grid-template-columns:repeat(4,1fr)}}
+  .grade.menor{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+  .card{border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff;display:flex;flex-direction:column}
+  .card h3{margin:0 0 6px;font-size:18px;color:var(--brand)}
+  .card p{margin:0 0 10px;color:var(--muted);font-size:15px}
+  .card .voce{margin:0 0 6px;font-weight:600;color:var(--ink);font-size:14px}
+  .card ul{margin:0 0 16px;padding-left:20px;font-size:15px}
+  .card li{margin-bottom:3px}
+  .card .acao{margin-top:auto}
+  .card.menor{background:var(--soft);padding:16px}
+  .card.menor h3{font-size:16px}
+  .card.menor p{margin:0;font-size:14px}
+  .card.menor .acao{margin-top:12px}
+  .card.servico{border-top:4px solid var(--accent)}
+  .card.servico p{margin:0}
+  button.acao{align-self:flex-start;background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;letter-spacing:.4px;cursor:pointer}
+  button.acao:hover{filter:brightness(1.2)}
+  button.acao[disabled]{background:#e6e2d8;color:#5b6168;cursor:not-allowed;filter:none}
+  #avisoChat{margin:18px 0 0;font-size:14px;font-weight:600;color:#8a4b00;min-height:1.4em}
+  .config{border:2px dashed var(--accent);border-radius:12px;padding:18px;margin:40px 0;background:#fffdf8}
+  .config h2{font-size:18px;color:var(--ink)}
+  .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px;margin:8px 0 6px}
+  .campos label{font-size:14px;font-weight:600;color:var(--brand);display:block}
+  .campos input[type=text]{width:100%;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-top:4px}
+  .campos input[type=color]{width:64px;height:38px;border:1px solid var(--line);border-radius:8px;margin-top:4px;padding:2px;background:#fff}
+  .config button{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
+  .config button.sec{background:#fff;color:var(--brand);border:1px solid var(--line);margin-left:8px}
+  #status{margin-top:10px;font-weight:600;font-size:15px;color:#2e7d32}
+  footer{background:var(--brand);color:#fff;font-size:13px;padding:18px 0}
+  footer p{margin:0 0 6px}
+  footer a{color:#fff}
+  @media (max-width:600px){h1{font-size:26px}.hero p.sub{font-size:16px}.config button.sec{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="aviso">LABORATÓRIO – DADOS FICTÍCIOS · página de treinamento, não é um site oficial</div>
+<header>
+  <div class="wrap top">
+    <div class="selo" id="selo" aria-hidden="true">LAB</div>
+    <div class="nome"><b id="tituloPortal">Portal do Cidadão</b><span>Central de Atendimento · ambiente de laboratório</span></div>
+  </div>
+  <nav aria-label="Menu principal"><div class="wrap">
+    <ul>
+      <li><a href="#inicio">Início</a></li>
+      <li><a href="#servicos">Certidões</a></li>
+      <li><a href="#servicos">Processos</a></li>
+      <li><a href="#canais">Ouvidoria</a></li>
+      <li><a href="#horarios">Horários</a></li>
+    </ul>
+  </div></nav>
+</header>
+
+<main id="inicio">
+  <div class="hero">
+    <div class="wrap">
+      <p class="trilha">Início › Atendimento › Canais de atendimento</p>
+      <h1>Como podemos ajudar?</h1>
+      <p class="sub">Escolha o canal mais adequado para sua situação. Certidões, andamento de processos, senha do peticionamento e ouvidoria: fale com a assistente virtual no balão do canto da tela.</p>
+      <div class="dica">💬 A assistente virtual é uma IA. Digite <b>ATENDENTE</b> a qualquer momento para falar com uma pessoa.</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <p id="avisoChat" role="status"></p>
+
+    <section id="canais" aria-labelledby="t-canais">
+      <h2 id="t-canais">Como falar com a Central de Atendimento</h2>
+      <p class="intro">Escolha o canal mais adequado para sua situação.</p>
+      <div class="grade canais">
+        <article class="card">
+          <h3>Assistente virtual (chat)</h3>
+          <p>Atendimento 24 horas, todos os dias.</p>
+          <p class="voce">Você pode:</p>
+          <ul>
+            <li>emitir certidão negativa;</li>
+            <li>consultar o andamento pelo número CNJ;</li>
+            <li>recuperar a senha do peticionamento;</li>
+            <li>registrar manifestação na ouvidoria.</li>
+          </ul>
+          <button type="button" class="acao abrir-chat">FALAR COM A ASSISTENTE</button>
+        </article>
+        <article class="card">
+          <h3>Atendimento humano</h3>
+          <p>Prefere falar com uma pessoa? Digite ATENDENTE no chat.</p>
+          <p class="voce">Você pode:</p>
+          <ul>
+            <li>pedir que uma pessoa assuma a conversa;</li>
+            <li>seguir de onde parou: a conversa vai para a equipe com o histórico.</li>
+          </ul>
+          <button type="button" class="acao abrir-chat">PEDIR ATENDENTE</button>
+        </article>
+        <article class="card">
+          <h3>Ouvidoria</h3>
+          <p>Seu registro ajuda a melhorar o atendimento.</p>
+          <p class="voce">Você pode:</p>
+          <ul>
+            <li>fazer reclamações e denúncias;</li>
+            <li>enviar elogios;</li>
+            <li>dar sugestões.</li>
+          </ul>
+          <button type="button" class="acao abrir-chat">REGISTRAR NA OUVIDORIA</button>
+        </article>
+        <article class="card" id="horarios">
+          <h3>Horários e contatos</h3>
+          <p>Dados fictícios, só para o laboratório.</p>
+          <p class="voce">Você pode:</p>
+          <ul>
+            <li>falar de segunda a sexta, das 11h às 19h;</li>
+            <li>ligar para (00) 0000-0000;</li>
+            <li>escrever para atendimento@exemplo.invalid.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="t-esp">
+      <h2 id="t-esp">Canais especializados</h2>
+      <div class="grade menor">
+        <article class="card menor"><h3>Atendimento em Libras</h3><p>Atendimento por vídeo em Língua Brasileira de Sinais.</p><button type="button" class="acao" disabled>Em breve</button></article>
+        <article class="card menor"><h3>Acessibilidade</h3><p>Apoio para quem precisa de recursos de acessibilidade no atendimento.</p><button type="button" class="acao" disabled>Em breve</button></article>
+        <article class="card menor"><h3>Proteção de dados (LGPD)</h3><p>Não digite dados reais no laboratório: use sempre informações inventadas.</p></article>
+      </div>
+    </section>
+
+    <section id="servicos" aria-labelledby="t-serv">
+      <h2 id="t-serv">Serviços mais buscados</h2>
+      <p class="intro">Pergunte à assistente virtual sobre qualquer um deles.</p>
+      <div class="grade menor">
+        <article class="card servico"><h3>Certidões</h3><p>Como emitir a certidão negativa pela internet.</p></article>
+        <article class="card servico"><h3>Andamento do processo</h3><p>Consulte pelo número no padrão CNJ.</p></article>
+        <article class="card servico"><h3>Esqueci a senha</h3><p>Recupere o acesso ao peticionamento eletrônico.</p></article>
+        <article class="card servico"><h3>Ouvidoria</h3><p>Reclamações, denúncias, elogios e sugestões.</p></article>
+      </div>
+    </section>
+
+    <section class="config" id="config" aria-labelledby="t-cara">
+      <h2 id="t-cara">⚙️ A cara do portal do grupo</h2>
+      <div class="campos">
+        <div><label for="grupo">Nome do grupo</label><input type="text" id="grupo" maxlength="40" placeholder="Ex.: Grupo 3 – Atendimento Ágil"></div>
+        <div><label for="cor">Cor principal</label><input type="color" id="cor" value="#404348"></div>
+        <div><label for="botao">Texto do botão do chat</label><input type="text" id="botao" maxlength="30" placeholder="Fale com a assistente"></div>
+      </div>
+      <button type="button" id="aplicar">Aplicar a cara do grupo</button>
+      <button type="button" class="sec" id="limpar">Apagar o que foi salvo</button>
+      <div id="status" role="status"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Página fictícia criada para a disciplina IA para Centros de Suporte. Nenhum dado real deve ser digitado aqui.</p>
+    <p><a href="/">← Voltar ao painel do kit</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const CV = "portal-lab-visual";
+  const ORIG = {titulo: $("tituloPortal").textContent, selo: $("selo").textContent};
+
+  function iniciais(n) {
+    const p = n.replace(/[^A-Za-zÀ-ú0-9 ]/g, " ").trim().split(/\s+/).filter(Boolean);
+    return p.length ? p.slice(0, 3).map(x => x[0]).join("").toUpperCase() : ORIG.selo;
+  }
+  function lerVisual() { try { return JSON.parse(localStorage.getItem(CV) || "{}"); } catch (e) { return {}; } }
+  function aplicar(v) {
+    const nome = (v.grupo || "").trim();
+    $("tituloPortal").textContent = nome ? ORIG.titulo + " – " + nome : ORIG.titulo;
+    $("selo").textContent = nome ? iniciais(nome) : ORIG.selo;
+    if (v.cor) document.documentElement.style.setProperty("--brand", v.cor);
+    else document.documentElement.style.removeProperty("--brand");
+    if (v.cor) $("cor").value = v.cor;
+    if (nome) $("grupo").value = nome;
+    if (v.botao) $("botao").value = v.botao;
+  }
+  function msg(t) { $("status").textContent = t; }
+
+  $("aplicar").onclick = function () {
+    const v = {grupo: $("grupo").value, cor: $("cor").value, botao: $("botao").value.trim()};
+    aplicar(v);
+    try { localStorage.setItem(CV, JSON.stringify(v)); } catch (e) { /* navegação privada: vale só nesta visita */ }
+    msg(window.chatwootSDK ? "Cara aplicada. Para o novo texto do botão do chat aparecer, recarregue a página (F5)." : "Cara do grupo aplicada.");
+  };
+  $("limpar").onclick = function () {
+    try { localStorage.removeItem(CV); } catch (e) { /* sem armazenamento, nada a apagar */ }
+    aplicar({}); $("grupo").value = ""; $("botao").value = ""; $("cor").value = "#404348";
+    msg("Cara do grupo apagada.");
+  };
+  aplicar(lerVisual());
+
+  // Balão do chat: vem pelo próprio painel (proxy do Chatwoot), então o SDK carrega de location.origin
+  const CHAT_URL = location.origin;
+  const aviso = t => { $("avisoChat").textContent = t; };
+  document.querySelectorAll(".abrir-chat").forEach(b => b.addEventListener("click", () => {
+    if (window.$chatwoot && window.$chatwoot.hasLoaded) { aviso(""); window.$chatwoot.toggle("open"); }
+    else aviso("O chat ainda não está pronto. Aguarde alguns segundos e tente de novo.");
+  }));
+
+  function chatIndisponivel() { aviso("O chat ainda não está pronto; volte ao painel do kit e confira se tudo está ligado."); }
+  async function ligarChat() {
+    let token = "";
+    try { token = (await (await fetch("/api/status")).json()).website_token; } catch (e) { /* tratado abaixo */ }
+    if (!token) return chatIndisponivel();
+    window.chatwootSettings = {locale: "pt_BR", position: "right", type: "expanded_bubble",
+                               launcherTitle: lerVisual().botao || "Fale com a assistente"};
+    const s = document.createElement("script");
+    s.src = CHAT_URL + "/packs/js/sdk.js"; s.async = true;
+    s.onerror = chatIndisponivel;
+    s.onload = () => window.chatwootSDK ? window.chatwootSDK.run({websiteToken: token, baseUrl: CHAT_URL}) : chatIndisponivel();
+    document.body.appendChild(s);
+  }
+  ligarChat();
+})();
+</script>
+</body>
+</html>

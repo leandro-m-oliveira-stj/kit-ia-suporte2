@@ -736,6 +736,11 @@ def pagina_de_diagnostico():
     return (STATIC / "diagnostico.html").read_text(encoding="utf-8")
 
 
+@app.get("/portal", response_class=HTMLResponse)
+def pagina_do_portal():
+    return (STATIC / "portal.html").read_text(encoding="utf-8")
+
+
 # ---------------------------------------------------------------------------------------------
 # Chat on-line servido pelo próprio painel. No Codespaces, quem abre a porta 3000 pelo navegador
 # vê antes o aviso "You are about to access a development port"; o cookie que libera esse aviso
