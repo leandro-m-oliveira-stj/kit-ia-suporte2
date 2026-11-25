@@ -1,108 +1,638 @@
 <!doctype html>
+<!--
+  ============================================================
+  MAPA DESTE ARQUIVO  (Portal do Cidadão – laboratório)
+  ============================================================
+  Uma página só, em três camadas: HTML (o conteúdo), CSS (a aparência,
+  dentro de <style>) e JavaScript (o comportamento, dentro de <script>).
+  Use Ctrl+F e procure pelo número da seção, por exemplo "SEÇÃO 4".
+
+   1. Cores e estilos ........ <style>, no topo do arquivo
+   2. Faixa e cabeçalho ...... aviso vermelho, nome do portal e menu
+   3. Boas-vindas ............ título grande e subtítulo
+   4. Experimente perguntar .. frases que o visitante clica para copiar
+   5. Canais ................. cartões "Como falar com a Central"
+   6. Canais especializados .. cartões menores
+   7. Serviços ............... cartões com borda dourada
+   8. Processos .............. tabela de processos fictícios
+   9. Perguntas frequentes ... FAQ que abre e fecha
+  10. Cara do grupo .......... caixa de personalização (nome, cor, botão)
+  11. Rodapé
+  12. Script ................. o que faz o chat e os botões funcionarem
+
+  LEGENDA DAS MARCAS (procure por elas com Ctrl+F)
+   ✏️ PODE MUDAR      texto e conteúdo livres: troque à vontade.
+   ➕ PARA ACRESCENTAR  explica como copiar um item para criar outro.
+   ⛔ NÃO MUDE         ids e classes que o script usa: mudar quebra o botão.
+
+  DICA: depois de editar, salve e recarregue a página (F5) para ver.
+-->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ✏️ PODE MUDAR: o título que aparece na aba do navegador -->
 <title>Portal do Cidadão – laboratório</title>
 <style>
-  :root{--ink:#22262b;--muted:#4a5560;--line:#d9e3e9;--soft:#e6ecf0;--brand:#004164;--accent:#f5af00;--red:#b2101d;--ok:#1f5836;--hover:#427591}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.5}
-  a{color:var(--brand)}
-  :focus-visible{outline:3px solid #2b6cb0;outline-offset:2px}
-  .aviso{background:var(--red);color:#fff;text-align:center;font-weight:700;padding:8px 16px;font-size:14px;letter-spacing:.3px}
-  header{background:var(--brand);color:#fff}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-  .top{display:flex;align-items:center;gap:14px;padding-top:18px;padding-bottom:18px}
-  .selo{flex:none;width:46px;height:46px;border-radius:50%;border:3px solid var(--accent);display:grid;place-items:center;font-weight:800;color:var(--accent);font-size:15px}
-  .nome b{display:block;font-size:20px}.nome span{font-size:13px;opacity:.85}
-  nav{border-top:1px solid rgba(255,255,255,.15)}
-  nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;column-gap:20px}
-  nav a{color:#fff;text-decoration:none;display:inline-block;padding:12px 0;font-size:15px}
-  nav a:hover{text-decoration:underline}
-  .hero{background:var(--soft);border-bottom:1px solid var(--line)}
-  .hero .wrap{padding:36px 20px}
-  .trilha{font-size:14px;color:var(--muted);margin:0 0 14px}
-  .trilha a{color:var(--muted)}
-  h1{margin:0 0 10px;font-size:34px;line-height:1.2}
-  .hero p.sub{margin:0;color:var(--muted);font-size:18px;max-width:640px}
-  .dica{margin-top:18px;display:inline-block;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:15px}
-  main section{padding:32px 0 0}
-  h2{margin:0 0 4px;font-size:24px;color:var(--brand)}
-  .intro{margin:0 0 16px;color:var(--muted)}
-  .grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
-  .grade.canais{grid-template-columns:1fr}
-  @media (min-width:640px){.grade.canais{grid-template-columns:repeat(2,1fr)}}
-  @media (min-width:1000px){.grade.canais{grid-template-columns:repeat(4,1fr)}}
-  .grade.menor{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
-  .card{border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff;display:flex;flex-direction:column}
-  .card h3{margin:0 0 6px;font-size:18px;color:var(--brand)}
-  .card p{margin:0 0 10px;color:var(--muted);font-size:15px}
-  .card .voce{margin:0 0 6px;font-weight:600;color:var(--ink);font-size:14px}
-  .card ul{margin:0 0 16px;padding-left:20px;font-size:15px}
-  .card li{margin-bottom:3px}
-  .card .acao{margin-top:auto}
-  .card.menor{background:var(--soft);padding:16px}
-  .card.menor h3{font-size:16px}
-  .card.menor p{margin:0;font-size:14px}
-  .card.menor .acao{margin-top:12px}
-  .card.servico{border-top:4px solid var(--accent)}
-  .card.servico p{margin:0}
-  button.acao{align-self:flex-start;background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;letter-spacing:.4px;cursor:pointer}
-  button.acao:hover{background:var(--hover)}
-  button.acao[disabled]{background:#fff;border:1px solid var(--line);color:var(--muted);cursor:not-allowed}
-  #avisoChat{margin:18px 0 0;font-size:14px;font-weight:600;color:#8a4b00;min-height:1.4em}
-  .chips{display:grid;grid-template-columns:1fr;gap:12px}
-  @media (min-width:640px){.chips{grid-template-columns:repeat(2,1fr)}}
-  @media (min-width:1000px){.chips{grid-template-columns:repeat(4,1fr)}}
-  .chip{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-  .chip small{color:var(--muted);font-size:13px;order:-1;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-  button.copiar{font-family:inherit;background:var(--soft);color:var(--brand);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px;font-weight:600;text-align:left;cursor:pointer}
-  button.copiar:hover{background:var(--brand);color:#fff}
-  .tabela{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
-  table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px}
-  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{background:var(--soft);color:var(--brand);font-size:14px}
-  tr:last-child td{border-bottom:0}
-  td .copiar{margin-left:8px;padding:4px 10px;font-size:13px}
-  td .num{white-space:nowrap;font-weight:600}
-  details{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px;background:#fff}
-  summary{cursor:pointer;font-weight:700;color:var(--brand)}
-  details ul{margin:10px 0 0;padding-left:20px;color:var(--ink)}
-  .config{border:2px dashed var(--accent);border-radius:12px;padding:18px;margin:40px 0;background:#fef7e6}
-  .config h2{font-size:18px;color:var(--ink)}
-  .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px;margin:8px 0 6px}
-  .campos label{font-size:14px;font-weight:600;color:var(--brand);display:block}
-  .campos input[type=text]{width:100%;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-top:4px}
-  .campos input[type=color]{width:64px;height:38px;border:1px solid var(--line);border-radius:8px;margin-top:4px;padding:2px;background:#fff}
-  .config button{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
-  .config button.sec{background:#fff;color:var(--brand);border:1px solid var(--line);margin-left:8px}
-  #status{margin-top:10px;font-weight:600;font-size:15px;color:var(--ok)}
-  footer{background:var(--brand);color:#fff;font-size:13px;padding:18px 0}
-  footer p{margin:0 0 6px}
-  footer a{color:#fff}
-  @media (max-width:600px){h1{font-size:26px}.hero p.sub{font-size:16px}.config button.sec{margin-left:0}}
+  /* ===== 1. Cores e estilos ===== */
+
+  /*
+    As cores vêm do manual da marca (paleta oficial).
+    O ouro (--accent) não serve como cor de texto em fundo claro:
+    use-o só em bordas, detalhes e sobre o azul.
+    Trocar um valor aqui muda a cor em toda a página.
+  */
+  :root {
+    --ink: #22262b;    /* texto principal (quase preto) */
+    --muted: #4a5560;  /* texto secundário: subtítulos, descrições */
+    --line: #d9e3e9;   /* linhas e bordas claras */
+    --soft: #e6ecf0;   /* fundo cinza-azulado: faixa de boas-vindas, cartões menores */
+    --brand: #004164;  /* azul principal: cabeçalho, botões, rodapé, títulos */
+    --accent: #f5af00; /* ouro: selo, borda dos serviços, moldura da caixa do grupo */
+    --red: #b2101d;    /* vermelho: faixa de aviso do topo */
+    --ok: #1f5836;     /* verde: mensagem de sucesso da caixa do grupo */
+    --hover: #427591;  /* azul claro: botões ao passar o mouse */
+  }
+
+  /* Regras gerais, valem para a página inteira */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--ink);
+    background: #fff;
+    line-height: 1.5;
+  }
+
+  a {
+    color: var(--brand);
+  }
+
+  /* Contorno azul ao navegar pelo teclado (acessibilidade): não remova */
+  :focus-visible {
+    outline: 3px solid #2b6cb0;
+    outline-offset: 2px;
+  }
+
+  /* Largura máxima do conteúdo, centralizado */
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ===== 2. Faixa e cabeçalho ===== */
+
+  .aviso {
+    background: var(--red);
+    color: #fff;
+    text-align: center;
+    font-weight: 700;
+    padding: 8px 16px;
+    font-size: 14px;
+    letter-spacing: .3px;
+  }
+
+  header {
+    background: var(--brand);
+    color: #fff;
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  /* Círculo com as iniciais, ao lado do nome */
+  .selo {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 15px;
+  }
+
+  .nome b {
+    display: block;
+    font-size: 20px;
+  }
+
+  .nome span {
+    font-size: 13px;
+    opacity: .85;
+  }
+
+  nav {
+    border-top: 1px solid rgba(255, 255, 255, .15);
+  }
+
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 20px;
+  }
+
+  nav a {
+    color: #fff;
+    text-decoration: none;
+    display: inline-block;
+    padding: 12px 0;
+    font-size: 15px;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
+  }
+
+  /* ===== 3. Boas-vindas ===== */
+
+  .hero {
+    background: var(--soft);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero .wrap {
+    padding: 36px 20px;
+  }
+
+  .trilha {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+
+  .trilha a {
+    color: var(--muted);
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: 34px;
+    line-height: 1.2;
+  }
+
+  .hero p.sub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 18px;
+    max-width: 640px;
+  }
+
+  /* Caixinha branca com a dica sobre a IA */
+  .dica {
+    margin-top: 18px;
+    display: inline-block;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  /* Telas estreitas (celular): letras um pouco menores */
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 26px;
+    }
+
+    .hero p.sub {
+      font-size: 16px;
+    }
+  }
+
+  /* Estilos comuns às seções abaixo (títulos, introdução, espaçamento) */
+  main section {
+    padding: 32px 0 0;
+  }
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: var(--brand);
+  }
+
+  .intro {
+    margin: 0 0 16px;
+    color: var(--muted);
+  }
+
+  /* Mensagem quando o chat não está pronto (o script escreve aqui) */
+  #avisoChat {
+    margin: 18px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8a4b00;
+    min-height: 1.4em;
+  }
+
+  /* ===== 4. Experimente perguntar ===== */
+
+  /* 1 coluna no celular, 2 em tela média, 4 em tela grande */
+  .chips {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  @media (min-width: 640px) {
+    .chips {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .chips {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .chip {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  /* Rótulo pequeno acima da frase (order: -1 o põe em primeiro) */
+  .chip small {
+    color: var(--muted);
+    font-size: 13px;
+    order: -1;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  /* Botão que copia a frase (também usado na tabela da seção 8) */
+  button.copiar {
+    font-family: inherit;
+    background: var(--soft);
+    color: var(--brand);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  button.copiar:hover {
+    background: var(--brand);
+    color: #fff;
+  }
+
+  /* ===== 5. Canais ===== */
+
+  /* Grade de cartões: o navegador decide quantas colunas cabem */
+  .grade {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 16px;
+  }
+
+  /* Variação dos canais: 1 / 2 / 4 colunas conforme a largura da tela */
+  .grade.canais {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .grade.canais {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .grade.canais {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    color: var(--brand);
+  }
+
+  .card p {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .card .voce {
+    margin: 0 0 6px;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 14px;
+  }
+
+  .card ul {
+    margin: 0 0 16px;
+    padding-left: 20px;
+    font-size: 15px;
+  }
+
+  .card li {
+    margin-bottom: 3px;
+  }
+
+  /* Empurra o botão para o rodapé do cartão */
+  .card .acao {
+    margin-top: auto;
+  }
+
+  /* Botão azul dos cartões (também usado na seção 6) */
+  button.acao {
+    align-self: flex-start;
+    background: var(--brand);
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    cursor: pointer;
+  }
+
+  button.acao:hover {
+    background: var(--hover);
+  }
+
+  /* Botão desativado ("Em breve") */
+  button.acao[disabled] {
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+
+  /* ===== 6. Canais especializados ===== */
+
+  /* Grade com colunas mais estreitas (também usada na seção 7) */
+  .grade.menor {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  }
+
+  .card.menor {
+    background: var(--soft);
+    padding: 16px;
+  }
+
+  .card.menor h3 {
+    font-size: 16px;
+  }
+
+  .card.menor p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .card.menor .acao {
+    margin-top: 12px;
+  }
+
+  /* ===== 7. Serviços ===== */
+
+  .card.servico {
+    border-top: 4px solid var(--accent);
+  }
+
+  .card.servico p {
+    margin: 0;
+  }
+
+  /* ===== 8. Processos ===== */
+
+  .tabela {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 640px;
+    font-size: 15px;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--soft);
+    color: var(--brand);
+    font-size: 14px;
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+
+  td .copiar {
+    margin-left: 8px;
+    padding: 4px 10px;
+    font-size: 13px;
+  }
+
+  td .num {
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  /* ===== 9. Perguntas frequentes ===== */
+
+  details {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    background: #fff;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--brand);
+  }
+
+  details ul {
+    margin: 10px 0 0;
+    padding-left: 20px;
+    color: var(--ink);
+  }
+
+  /* ===== 10. Cara do grupo ===== */
+
+  /* Moldura pontilhada dourada em volta da caixa */
+  .config {
+    border: 2px dashed var(--accent);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 40px 0;
+    background: #fef7e6;
+  }
+
+  .config h2 {
+    font-size: 18px;
+    color: var(--ink);
+  }
+
+  .campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 12px;
+    margin: 8px 0 6px;
+  }
+
+  .campos label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--brand);
+    display: block;
+  }
+
+  .campos input[type=text] {
+    width: 100%;
+    font-size: 15px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+
+  .campos input[type=color] {
+    width: 64px;
+    height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-top: 4px;
+    padding: 2px;
+    background: #fff;
+  }
+
+  .config button {
+    background: var(--brand);
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* Botão secundário ("Apagar o que foi salvo"): fundo branco */
+  .config button.sec {
+    background: #fff;
+    color: var(--brand);
+    border: 1px solid var(--line);
+    margin-left: 8px;
+  }
+
+  #status {
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ok);
+  }
+
+  /* No celular o botão secundário vai para baixo, sem margem à esquerda */
+  @media (max-width: 600px) {
+    .config button.sec {
+      margin-left: 0;
+    }
+  }
+
+  /* ===== 11. Rodapé ===== */
+
+  footer {
+    background: var(--brand);
+    color: #fff;
+    font-size: 13px;
+    padding: 18px 0;
+  }
+
+  footer p {
+    margin: 0 0 6px;
+  }
+
+  footer a {
+    color: #fff;
+  }
 </style>
 </head>
 <body>
+
+<!-- ============ 2. FAIXA E CABEÇALHO ============
+     ✏️ PODE MUDAR: o texto da faixa vermelha, o nome do portal, o subtítulo e os
+     itens do menu (o texto de cada <a>).
+     ⛔ NÃO MUDE: id="selo" e id="tituloPortal" (o script troca o nome e as
+     iniciais quando o grupo usa a seção 10).
+     Os href="#..." do menu apontam para o id de uma seção mais abaixo
+     (#servicos, #canais, #horarios): se mudar um id lá, mude aqui também. -->
 <div class="aviso">LABORATÓRIO – DADOS FICTÍCIOS · página de treinamento, não é um site oficial</div>
 <header>
   <div class="wrap top">
     <div class="selo" id="selo" aria-hidden="true">LAB</div>
-    <div class="nome"><b id="tituloPortal">Portal do Cidadão</b><span>Central de Atendimento · ambiente de laboratório</span></div>
+    <div class="nome">
+      <b id="tituloPortal">Portal do Cidadão</b>
+      <span>Central de Atendimento · ambiente de laboratório</span>
+    </div>
   </div>
-  <nav aria-label="Menu principal"><div class="wrap">
-    <ul>
-      <li><a href="#inicio">Início</a></li>
-      <li><a href="#servicos">Certidões</a></li>
-      <li><a href="#servicos">Processos</a></li>
-      <li><a href="#canais">Ouvidoria</a></li>
-      <li><a href="#horarios">Horários</a></li>
-    </ul>
-  </div></nav>
+  <nav aria-label="Menu principal">
+    <div class="wrap">
+      <ul>
+        <li><a href="#inicio">Início</a></li>
+        <li><a href="#servicos">Certidões</a></li>
+        <li><a href="#servicos">Processos</a></li>
+        <li><a href="#canais">Ouvidoria</a></li>
+        <li><a href="#horarios">Horários</a></li>
+      </ul>
+    </div>
+  </nav>
 </header>
 
 <main id="inicio">
+
+  <!-- ============ 3. BOAS-VINDAS ============
+       ✏️ PODE MUDAR: a trilha ("Início › ..."), o título (h1), o subtítulo
+       (p.sub) e o texto da dica. -->
   <div class="hero">
     <div class="wrap">
       <p class="trilha">Início › Atendimento › Canais de atendimento</p>
@@ -113,24 +643,68 @@
   </div>
 
   <div class="wrap">
+    <!-- ⛔ NÃO MUDE: id="avisoChat". O script escreve aqui quando o chat não está pronto. -->
     <p id="avisoChat" role="status"></p>
 
+    <!-- ============ 4. EXPERIMENTE PERGUNTAR ============
+         ✏️ PODE MUDAR: o título, a introdução, o rótulo pequeno (dentro de <small>)
+         e a frase de cada chip.
+         ➕ PARA ACRESCENTAR: copie um bloco <div class="chip"> inteiro (de
+         <div class="chip"> até o </div> dele) e cole logo depois de outro.
+         ATENÇÃO: o texto do botão e o data-copiar precisam ser IGUAIS. O texto
+         é o que o visitante lê; o data-copiar é o que vai para a área de
+         transferência.
+         ⛔ NÃO MUDE: class="copiar" e o nome data-copiar (o script procura por eles)
+         e id="avisoCopia". -->
     <section id="experimente" aria-labelledby="t-exp">
       <h2 id="t-exp">Experimente perguntar</h2>
       <p class="intro">Clique numa frase: ela é copiada e o chat abre. Cole no chat (Ctrl+V) e veja o caminho que o bot segue.</p>
       <div class="chips">
-        <div class="chip"><small>Saudação</small><button type="button" class="copiar" data-copiar="oi">oi</button></div>
-        <div class="chip"><small>Base de conhecimento</small><button type="button" class="copiar" data-copiar="como emito uma certidão negativa?">como emito uma certidão negativa?</button></div>
-        <div class="chip"><small>Base de conhecimento</small><button type="button" class="copiar" data-copiar="que horas abre o atendimento?">que horas abre o atendimento?</button></div>
-        <div class="chip"><small>Base de conhecimento</small><button type="button" class="copiar" data-copiar="esqueci a senha do peticionamento">esqueci a senha do peticionamento</button></div>
-        <div class="chip"><small>Ouvidoria</small><button type="button" class="copiar" data-copiar="quero fazer uma reclamação sobre o atendimento">quero fazer uma reclamação sobre o atendimento</button></div>
-        <div class="chip"><small>API do tribunal</small><button type="button" class="copiar" data-copiar="qual o andamento do processo 0001234-52.2026.3.00.0000?">qual o andamento do processo 0001234-52.2026.3.00.0000?</button></div>
-        <div class="chip"><small>Recusa: fora do escopo</small><button type="button" class="copiar" data-copiar="vou ganhar meu recurso?">vou ganhar meu recurso?</button></div>
-        <div class="chip"><small>Atendente (vai para uma pessoa)</small><button type="button" class="copiar" data-copiar="ATENDENTE">ATENDENTE</button></div>
+        <div class="chip">
+          <small>Saudação</small>
+          <button type="button" class="copiar" data-copiar="oi">oi</button>
+        </div>
+        <div class="chip">
+          <small>Base de conhecimento</small>
+          <button type="button" class="copiar" data-copiar="como emito uma certidão negativa?">como emito uma certidão negativa?</button>
+        </div>
+        <div class="chip">
+          <small>Base de conhecimento</small>
+          <button type="button" class="copiar" data-copiar="que horas abre o atendimento?">que horas abre o atendimento?</button>
+        </div>
+        <div class="chip">
+          <small>Base de conhecimento</small>
+          <button type="button" class="copiar" data-copiar="esqueci a senha do peticionamento">esqueci a senha do peticionamento</button>
+        </div>
+        <div class="chip">
+          <small>Ouvidoria</small>
+          <button type="button" class="copiar" data-copiar="quero fazer uma reclamação sobre o atendimento">quero fazer uma reclamação sobre o atendimento</button>
+        </div>
+        <div class="chip">
+          <small>API do tribunal</small>
+          <button type="button" class="copiar" data-copiar="qual o andamento do processo 0001234-52.2026.3.00.0000?">qual o andamento do processo 0001234-52.2026.3.00.0000?</button>
+        </div>
+        <div class="chip">
+          <small>Recusa: fora do escopo</small>
+          <button type="button" class="copiar" data-copiar="vou ganhar meu recurso?">vou ganhar meu recurso?</button>
+        </div>
+        <div class="chip">
+          <small>Atendente (vai para uma pessoa)</small>
+          <button type="button" class="copiar" data-copiar="ATENDENTE">ATENDENTE</button>
+        </div>
       </div>
       <p id="avisoCopia" role="status" class="intro"></p>
     </section>
 
+    <!-- ============ 5. CANAIS ============
+         ✏️ PODE MUDAR: título, introdução, e dentro de cada cartão o título (h3),
+         a descrição, a lista "Você pode" e o texto do botão.
+         ➕ PARA ACRESCENTAR: copie um <article class="card"> inteiro e cole
+         depois de outro. Para um item novo na lista, copie uma linha <li>.
+         A grade ajusta as colunas sozinha (4 em tela grande).
+         ⛔ NÃO MUDE: class="abrir-chat" nos botões (é ela que faz o botão abrir o
+         chat). Um cartão sem botão, como "Horários", simplesmente não tem a classe.
+         O id="horarios" do cartão de horários é o destino do item "Horários" do menu. -->
     <section id="canais" aria-labelledby="t-canais">
       <h2 id="t-canais">Como falar com a Central de Atendimento</h2>
       <p class="intro">Escolha o canal mais adequado para sua situação.</p>
@@ -180,57 +754,181 @@
       </div>
     </section>
 
+    <!-- ============ 6. CANAIS ESPECIALIZADOS ============
+         ✏️ PODE MUDAR: título, texto dos cartões e do botão.
+         ➕ PARA ACRESCENTAR: copie um <article class="card menor"> inteiro.
+         O botão com "disabled" fica cinza e não clica (é o "Em breve"); tire a
+         palavra disabled e acrescente a classe abrir-chat se quiser que abra o chat. -->
     <section aria-labelledby="t-esp">
       <h2 id="t-esp">Canais especializados</h2>
       <div class="grade menor">
-        <article class="card menor"><h3>Atendimento em Libras</h3><p>Atendimento por vídeo em Língua Brasileira de Sinais.</p><button type="button" class="acao" disabled>Em breve</button></article>
-        <article class="card menor"><h3>Acessibilidade</h3><p>Apoio para quem precisa de recursos de acessibilidade no atendimento.</p><button type="button" class="acao" disabled>Em breve</button></article>
-        <article class="card menor"><h3>Proteção de dados (LGPD)</h3><p>Não digite dados reais no laboratório: use sempre informações inventadas.</p></article>
+        <article class="card menor">
+          <h3>Atendimento em Libras</h3>
+          <p>Atendimento por vídeo em Língua Brasileira de Sinais.</p>
+          <button type="button" class="acao" disabled>Em breve</button>
+        </article>
+        <article class="card menor">
+          <h3>Acessibilidade</h3>
+          <p>Apoio para quem precisa de recursos de acessibilidade no atendimento.</p>
+          <button type="button" class="acao" disabled>Em breve</button>
+        </article>
+        <article class="card menor">
+          <h3>Proteção de dados (LGPD)</h3>
+          <p>Não digite dados reais no laboratório: use sempre informações inventadas.</p>
+        </article>
       </div>
     </section>
 
+    <!-- ============ 7. SERVIÇOS ============
+         ✏️ PODE MUDAR: título, introdução, título e descrição de cada serviço.
+         ➕ PARA ACRESCENTAR: copie um <article class="card servico"> inteiro.
+         ⛔ NÃO MUDE: id="servicos" (o menu "Certidões" e "Processos" leva até aqui). -->
     <section id="servicos" aria-labelledby="t-serv">
       <h2 id="t-serv">Serviços mais buscados</h2>
       <p class="intro">Pergunte à assistente virtual sobre qualquer um deles.</p>
       <div class="grade menor">
-        <article class="card servico"><h3>Certidões</h3><p>Como emitir a certidão negativa pela internet.</p></article>
-        <article class="card servico"><h3>Andamento do processo</h3><p>Consulte pelo número no padrão CNJ.</p></article>
-        <article class="card servico"><h3>Esqueci a senha</h3><p>Recupere o acesso ao peticionamento eletrônico.</p></article>
-        <article class="card servico"><h3>Ouvidoria</h3><p>Reclamações, denúncias, elogios e sugestões.</p></article>
+        <article class="card servico">
+          <h3>Certidões</h3>
+          <p>Como emitir a certidão negativa pela internet.</p>
+        </article>
+        <article class="card servico">
+          <h3>Andamento do processo</h3>
+          <p>Consulte pelo número no padrão CNJ.</p>
+        </article>
+        <article class="card servico">
+          <h3>Esqueci a senha</h3>
+          <p>Recupere o acesso ao peticionamento eletrônico.</p>
+        </article>
+        <article class="card servico">
+          <h3>Ouvidoria</h3>
+          <p>Reclamações, denúncias, elogios e sugestões.</p>
+        </article>
       </div>
     </section>
 
+    <!-- ============ 8. PROCESSOS ============
+         ✏️ PODE MUDAR: título, introdução, os cabeçalhos (th) e o texto das células.
+         ➕ PARA ACRESCENTAR: copie uma linha <tr> inteira (de <tr> até </tr>)
+         e cole depois de outra, dentro de <tbody>.
+         ATENÇÃO: o número que aparece (dentro de <span class="num">) e o
+         data-copiar do botão precisam ser IGUAIS.
+         ⛔ NÃO MUDE: class="copiar" e data-copiar no botão. Deixe o <span> e o
+         <button> da primeira célula na mesma linha, senão aparece um espaço a mais. -->
     <section id="processos" aria-labelledby="t-proc">
       <h2 id="t-proc">Processos fictícios para testar</h2>
       <p class="intro">Use estes números na pergunta sobre andamento. Todos são inventados.</p>
       <div class="tabela" role="region" aria-label="Processos fictícios" tabindex="0">
         <table>
-          <thead><tr><th scope="col">Número</th><th scope="col">Classe</th><th scope="col">Órgão</th><th scope="col">Última movimentação</th><th scope="col">Data</th></tr></thead>
+          <thead>
+            <tr>
+              <th scope="col">Número</th>
+              <th scope="col">Classe</th>
+              <th scope="col">Órgão</th>
+              <th scope="col">Última movimentação</th>
+              <th scope="col">Data</th>
+            </tr>
+          </thead>
           <tbody>
-          <tr><td><span class="num">0001234-52.2026.3.00.0000</span><button type="button" class="copiar" data-copiar="0001234-52.2026.3.00.0000">Copiar</button></td><td>Recurso Especial</td><td>Terceira Turma</td><td>Conclusos ao relator</td><td>10/10/2026</td></tr>
-          <tr><td><span class="num">0004321-50.2025.3.00.0000</span><button type="button" class="copiar" data-copiar="0004321-50.2025.3.00.0000">Copiar</button></td><td>Agravo em Recurso Especial</td><td>Primeira Turma</td><td>Publicado acórdão</td><td>02/10/2026</td></tr>
-          <tr><td><span class="num">0007777-71.2026.3.00.0000</span><button type="button" class="copiar" data-copiar="0007777-71.2026.3.00.0000">Copiar</button></td><td>Recurso Especial (segredo de justiça)</td><td>Quarta Turma</td><td>Acesso restrito: o bot não mostra os dados</td><td>—</td></tr>
+            <tr>
+              <td><span class="num">0001234-52.2026.3.00.0000</span><button type="button" class="copiar" data-copiar="0001234-52.2026.3.00.0000">Copiar</button></td>
+              <td>Recurso Especial</td>
+              <td>Terceira Turma</td>
+              <td>Conclusos ao relator</td>
+              <td>10/10/2026</td>
+            </tr>
+            <tr>
+              <td><span class="num">0004321-50.2025.3.00.0000</span><button type="button" class="copiar" data-copiar="0004321-50.2025.3.00.0000">Copiar</button></td>
+              <td>Agravo em Recurso Especial</td>
+              <td>Primeira Turma</td>
+              <td>Publicado acórdão</td>
+              <td>02/10/2026</td>
+            </tr>
+            <tr>
+              <td><span class="num">0007777-71.2026.3.00.0000</span><button type="button" class="copiar" data-copiar="0007777-71.2026.3.00.0000">Copiar</button></td>
+              <td>Recurso Especial (segredo de justiça)</td>
+              <td>Quarta Turma</td>
+              <td>Acesso restrito: o bot não mostra os dados</td>
+              <td>—</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </section>
 
+    <!-- ============ 9. PERGUNTAS FREQUENTES ============
+         ✏️ PODE MUDAR: título, introdução, a pergunta (dentro de <summary>) e cada
+         resposta (os <li>).
+         ➕ PARA ACRESCENTAR: copie um <details> inteiro (de <details> até
+         </details>) e cole depois de outro. Para um ponto novo na resposta,
+         copie uma linha <li>.
+         Não precisa de script: o abrir e fechar é do próprio navegador. -->
     <section id="faq" aria-labelledby="t-faq">
       <h2 id="t-faq">Perguntas frequentes</h2>
       <p class="intro">São os mesmos artigos que a assistente consulta.</p>
-      <details><summary>Como pedir uma certidão negativa (nada consta)</summary><ul><li>O pedido é feito por e-mail à Secretaria Judiciária do tribunal, e o serviço é gratuito.</li><li>Informe o nome completo da parte e se quer só processos ativos ou ativos e baixados.</li><li>A certidão não é emitida a partir do CPF ou do CNPJ.</li><li>Para processo em segredo de justiça, envie cópia do documento de identidade da parte ou do advogado.</li></ul></details>
-      <details><summary>Horário de atendimento</summary><ul><li>Expediente para o público externo: segunda a sexta, das 11h às 19h.</li><li>Atendimento judicial (telefone, e-mail, Balcão Virtual e Espaço do Advogado): segunda a sexta, das 10h às 19h.</li><li>Sábados, domingos e feriados: plantão judiciário apenas para casos urgentes.</li><li>Recesso forense: de 20 de dezembro a 6 de janeiro.</li></ul></details>
-      <details><summary>Esqueci a senha da Central do Processo Eletrônico (CPE)</summary><ul><li>Na tela de acesso, clique em "Esqueceu a senha?" e siga as instruções enviadas ao seu e-mail.</li><li>Se não conseguir, procure o atendimento judicial por telefone ou pelo Balcão Virtual.</li><li>Peça ajuda imediatamente se o prazo vence hoje ou se a conta bloqueou após várias tentativas.</li></ul></details>
-      <details><summary>Como falar com a Ouvidoria</summary><ul><li>A Ouvidoria recebe reclamações, denúncias, elogios e sugestões sobre os serviços do tribunal.</li><li>O contato é por telefone ou pelo formulário eletrônico.</li><li>Ela não analisa o mérito de processos e não substitui recursos.</li></ul></details>
-      <details><summary>Como acompanhar o andamento de um processo</summary><ul><li>Use a Consulta Processual e pesquise pelo número do processo, pelo número de registro ou pelo nome da parte.</li><li>Ali você vê as fases e a última movimentação.</li><li>O atendimento não informa previsão de julgamento nem opina sobre o resultado.</li></ul></details>
+      <details>
+        <summary>Como pedir uma certidão negativa (nada consta)</summary>
+        <ul>
+          <li>O pedido é feito por e-mail à Secretaria Judiciária do tribunal, e o serviço é gratuito.</li>
+          <li>Informe o nome completo da parte e se quer só processos ativos ou ativos e baixados.</li>
+          <li>A certidão não é emitida a partir do CPF ou do CNPJ.</li>
+          <li>Para processo em segredo de justiça, envie cópia do documento de identidade da parte ou do advogado.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Horário de atendimento</summary>
+        <ul>
+          <li>Expediente para o público externo: segunda a sexta, das 11h às 19h.</li>
+          <li>Atendimento judicial (telefone, e-mail, Balcão Virtual e Espaço do Advogado): segunda a sexta, das 10h às 19h.</li>
+          <li>Sábados, domingos e feriados: plantão judiciário apenas para casos urgentes.</li>
+          <li>Recesso forense: de 20 de dezembro a 6 de janeiro.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Esqueci a senha da Central do Processo Eletrônico (CPE)</summary>
+        <ul>
+          <li>Na tela de acesso, clique em "Esqueceu a senha?" e siga as instruções enviadas ao seu e-mail.</li>
+          <li>Se não conseguir, procure o atendimento judicial por telefone ou pelo Balcão Virtual.</li>
+          <li>Peça ajuda imediatamente se o prazo vence hoje ou se a conta bloqueou após várias tentativas.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Como falar com a Ouvidoria</summary>
+        <ul>
+          <li>A Ouvidoria recebe reclamações, denúncias, elogios e sugestões sobre os serviços do tribunal.</li>
+          <li>O contato é por telefone ou pelo formulário eletrônico.</li>
+          <li>Ela não analisa o mérito de processos e não substitui recursos.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Como acompanhar o andamento de um processo</summary>
+        <ul>
+          <li>Use a Consulta Processual e pesquise pelo número do processo, pelo número de registro ou pelo nome da parte.</li>
+          <li>Ali você vê as fases e a última movimentação.</li>
+          <li>O atendimento não informa previsão de julgamento nem opina sobre o resultado.</li>
+        </ul>
+      </details>
     </section>
 
+    <!-- ============ 10. CARA DO GRUPO ============
+         ✏️ PODE MUDAR: o título, os rótulos (label) e os exemplos (placeholder).
+         ⛔ NÃO MUDE: os ids grupo, cor, botao, aplicar, limpar e status. O script
+         lê e escreve neles. O value="#004164" do campo de cor deve ser igual ao
+         valor de brand no :root (seção 1), porque é a cor original do portal. -->
     <section class="config" id="config" aria-labelledby="t-cara">
       <h2 id="t-cara">⚙️ A cara do portal do grupo</h2>
       <div class="campos">
-        <div><label for="grupo">Nome do grupo</label><input type="text" id="grupo" maxlength="40" placeholder="Ex.: Grupo 3 – Atendimento Ágil"></div>
-        <div><label for="cor">Cor principal</label><input type="color" id="cor" value="#004164"></div>
-        <div><label for="botao">Texto do botão do chat</label><input type="text" id="botao" maxlength="30" placeholder="Fale com a assistente"></div>
+        <div>
+          <label for="grupo">Nome do grupo</label>
+          <input type="text" id="grupo" maxlength="40" placeholder="Ex.: Grupo 3 – Atendimento Ágil">
+        </div>
+        <div>
+          <label for="cor">Cor principal</label>
+          <input type="color" id="cor" value="#004164">
+        </div>
+        <div>
+          <label for="botao">Texto do botão do chat</label>
+          <input type="text" id="botao" maxlength="30" placeholder="Fale com a assistente">
+        </div>
       </div>
       <button type="button" id="aplicar">Aplicar a cara do grupo</button>
       <button type="button" class="sec" id="limpar">Apagar o que foi salvo</button>
@@ -239,6 +937,9 @@
   </div>
 </main>
 
+<!-- ============ 11. RODAPÉ ============
+     ✏️ PODE MUDAR: os dois textos. O link "Voltar ao painel do kit" (href="/")
+     leva à página inicial do kit. -->
 <footer>
   <div class="wrap">
     <p>Página fictícia criada para a disciplina IA para Centros de Suporte. Nenhum dado real deve ser digitado aqui.</p>
@@ -246,80 +947,248 @@
   </div>
 </footer>
 
+<!-- ============ 12. SCRIPT ============
+     Só mexa aqui se quiser mudar o comportamento. Para trocar textos, use as
+     "Configurações" logo abaixo. O script roda dentro de uma função anônima
+     (IIFE) para não misturar suas variáveis com as do chat. -->
 <script>
 (function () {
-  const $ = id => document.getElementById(id);
-  const CV = "portal-lab-visual";
-  const ORIG = {titulo: $("tituloPortal").textContent, selo: $("selo").textContent};
+  // ===== Configurações (✏️ PODE MUDAR) =====
+  const CHAVE_ARMAZENAMENTO = "portal-lab-visual";    // nome da gaveta no navegador onde a cara do grupo é salva
+  const TEXTO_PADRAO_BOTAO_CHAT = "Fale com a assistente"; // texto do balão do chat quando o grupo não escolheu outro
+  const COR_PADRAO = "#004164";                       // igual ao --brand do CSS e ao value do campo #cor
+  const URL_DO_CHAT = location.origin;                // o chat vem pelo próprio painel (proxy do Chatwoot)
 
-  function iniciais(n) {
-    const p = n.replace(/[^A-Za-zÀ-ú0-9 ]/g, " ").trim().split(/\s+/).filter(Boolean);
-    return p.length ? p.slice(0, 3).map(x => x[0]).join("").toUpperCase() : ORIG.selo;
-  }
-  function lerVisual() { try { return JSON.parse(localStorage.getItem(CV) || "{}"); } catch (e) { return {}; } }
-  function aplicar(v) {
-    const nome = (v.grupo || "").trim();
-    $("tituloPortal").textContent = nome ? ORIG.titulo + " – " + nome : ORIG.titulo;
-    $("selo").textContent = nome ? iniciais(nome) : ORIG.selo;
-    if (v.cor) document.documentElement.style.setProperty("--brand", v.cor);
-    else document.documentElement.style.removeProperty("--brand");
-    if (v.cor) $("cor").value = v.cor;
-    if (nome) $("grupo").value = nome;
-    if (v.botao) $("botao").value = v.botao;
-  }
-  function msg(t) { $("status").textContent = t; }
+  // ===== Atalhos =====
 
-  $("aplicar").onclick = function () {
-    const v = {grupo: $("grupo").value, cor: $("cor").value, botao: $("botao").value.trim()};
-    aplicar(v);
-    try { localStorage.setItem(CV, JSON.stringify(v)); } catch (e) { /* navegação privada: vale só nesta visita */ }
-    msg(window.chatwootSDK ? "Cara aplicada. Para o novo texto do botão do chat aparecer, recarregue a página (F5)." : "Cara do grupo aplicada.");
+  // Busca um elemento da página pelo id (atalho de document.getElementById)
+  const porId = id => document.getElementById(id);
+
+  // ===== Cara do grupo (seção 10) =====
+  // ⛔ ids que o script procura: tituloPortal, selo, grupo, cor, botao, aplicar, limpar, status
+
+  // Guarda o título e o selo originais, para voltar a eles ao apagar a cara do grupo
+  const ORIGINAL = {
+    titulo: porId("tituloPortal").textContent,
+    selo: porId("selo").textContent
   };
-  $("limpar").onclick = function () {
-    try { localStorage.removeItem(CV); } catch (e) { /* sem armazenamento, nada a apagar */ }
-    aplicar({}); $("grupo").value = ""; $("botao").value = ""; $("cor").value = "#004164";
-    msg("Cara do grupo apagada.");
-  };
-  aplicar(lerVisual());
 
-  // Balão do chat: vem pelo próprio painel (proxy do Chatwoot), então o SDK carrega de location.origin
-  const CHAT_URL = location.origin;
-  const aviso = t => { $("avisoChat").textContent = t; };
-  document.querySelectorAll(".abrir-chat").forEach(b => b.addEventListener("click", () => {
-    if (window.$chatwoot && window.$chatwoot.hasLoaded) { aviso(""); window.$chatwoot.toggle("open"); }
-    else aviso("O chat ainda não está pronto. Aguarde alguns segundos e tente de novo.");
-  }));
+  // Gera as iniciais (até 3 letras) do nome do grupo para o selo; sem nome, volta ao selo original
+  function gerarIniciais(nome) {
+    const palavras = nome.replace(/[^A-Za-zÀ-ú0-9 ]/g, " ").trim().split(/\s+/).filter(Boolean);
+    if (palavras.length === 0) return ORIGINAL.selo;
+    return palavras.slice(0, 3).map(palavra => palavra[0]).join("").toUpperCase();
+  }
 
-  function copiarTexto(t) {
-    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
-    return new Promise((ok, falha) => {  // sem HTTPS a API moderna não existe: usa o método antigo
-      const a = document.createElement("textarea");
-      a.value = t; a.style.position = "fixed"; a.style.opacity = "0";
-      document.body.appendChild(a); a.select();
-      try { document.execCommand("copy") ? ok() : falha(); } catch (e) { falha(e); } finally { a.remove(); }
+  // Lê do navegador o que foi salvo antes ({grupo, cor, botao}); sem nada salvo, devolve {}
+  function lerVisualSalvo() {
+    // try/catch: em navegação privada ou com o armazenamento bloqueado o navegador dá erro
+    try {
+      return JSON.parse(localStorage.getItem(CHAVE_ARMAZENAMENTO) || "{}");
+    } catch (erro) {
+      return {};
+    }
+  }
+
+  // Grava no navegador a cara do grupo
+  function salvarVisual(visual) {
+    // try/catch: em navegação privada não dá para gravar; a cara vale só nesta visita
+    try {
+      localStorage.setItem(CHAVE_ARMAZENAMENTO, JSON.stringify(visual));
+    } catch (erro) {
+      /* sem armazenamento: nada a fazer */
+    }
+  }
+
+  // Apaga do navegador a cara do grupo
+  function apagarVisualSalvo() {
+    // try/catch: sem armazenamento disponível, não há o que apagar
+    try {
+      localStorage.removeItem(CHAVE_ARMAZENAMENTO);
+    } catch (erro) {
+      /* sem armazenamento: nada a apagar */
+    }
+  }
+
+  // Mostra na página o nome, as iniciais, a cor e os campos do formulário
+  function aplicarVisual(visual) {
+    const nome = (visual.grupo || "").trim();
+    const raiz = document.documentElement;
+
+    porId("tituloPortal").textContent = nome ? ORIGINAL.titulo + " – " + nome : ORIGINAL.titulo;
+    porId("selo").textContent = nome ? gerarIniciais(nome) : ORIGINAL.selo;
+
+    if (visual.cor) {
+      raiz.style.setProperty("--brand", visual.cor);
+      porId("cor").value = visual.cor;
+    } else {
+      raiz.style.removeProperty("--brand");
+    }
+    if (nome) porId("grupo").value = nome;
+    if (visual.botao) porId("botao").value = visual.botao;
+  }
+
+  // Escreve a mensagem de resultado embaixo dos botões da seção 10
+  function mostrarStatus(texto) {
+    porId("status").textContent = texto;
+  }
+
+  // Botão "Aplicar": aplica, salva e avisa (o texto do balão só muda ao recarregar)
+  function aoClicarAplicar() {
+    const visual = {
+      grupo: porId("grupo").value,
+      cor: porId("cor").value,
+      botao: porId("botao").value.trim()
+    };
+    aplicarVisual(visual);
+    salvarVisual(visual);
+    mostrarStatus(window.chatwootSDK
+      ? "Cara aplicada. Para o novo texto do botão do chat aparecer, recarregue a página (F5)."
+      : "Cara do grupo aplicada.");
+  }
+
+  // Botão "Apagar": remove o que foi salvo e limpa os campos
+  function aoClicarLimpar() {
+    apagarVisualSalvo();
+    aplicarVisual({});
+    porId("grupo").value = "";
+    porId("botao").value = "";
+    porId("cor").value = COR_PADRAO;
+    mostrarStatus("Cara do grupo apagada.");
+  }
+
+  // Liga os dois botões da seção 10 e aplica o que já estava salvo
+  function iniciarCaraDoGrupo() {
+    porId("aplicar").onclick = aoClicarAplicar;
+    porId("limpar").onclick = aoClicarLimpar;
+    aplicarVisual(lerVisualSalvo());
+  }
+
+  // ===== Chat (balão do Chatwoot) =====
+  // ⛔ ids e classes que o script procura: avisoChat, classe abrir-chat
+
+  // Escreve uma mensagem no aviso do chat (texto vazio apaga o aviso)
+  function mostrarAvisoChat(texto) {
+    porId("avisoChat").textContent = texto;
+  }
+
+  // Diz se o balão do chat já carregou e pode ser aberto
+  function chatEstaPronto() {
+    return Boolean(window.$chatwoot && window.$chatwoot.hasLoaded);
+  }
+
+  // Abre o balão do chat, se ele já estiver pronto
+  function abrirChatSePronto() {
+    if (chatEstaPronto()) window.$chatwoot.toggle("open");
+  }
+
+  // Botões com a classe abrir-chat: abrem o chat ou avisam que ainda não está pronto
+  function ligarBotoesDoChat() {
+    document.querySelectorAll(".abrir-chat").forEach(botao => {
+      botao.addEventListener("click", () => {
+        if (!chatEstaPronto()) {
+          mostrarAvisoChat("O chat ainda não está pronto. Aguarde alguns segundos e tente de novo.");
+          return;
+        }
+        mostrarAvisoChat("");
+        window.$chatwoot.toggle("open");
+      });
     });
   }
-  document.querySelectorAll("[data-copiar]").forEach(b => b.addEventListener("click", async () => {
-    const t = b.dataset.copiar;
-    let copiou = true;
-    try { await copiarTexto(t); } catch (e) { copiou = false; }
-    $("avisoCopia").textContent = copiou ? "Copiado: cole no chat (Ctrl+V)." : "Não consegui copiar: selecione e copie a frase à mão.";
-    if (window.$chatwoot && window.$chatwoot.hasLoaded) window.$chatwoot.toggle("open");
-  }));
 
-  function chatIndisponivel() { aviso("O chat ainda não está pronto; volte ao painel do kit e confira se tudo está ligado."); }
-  async function ligarChat() {
-    let token = "";
-    try { token = (await (await fetch("/api/status")).json()).website_token; } catch (e) { /* tratado abaixo */ }
-    if (!token) return chatIndisponivel();
-    window.chatwootSettings = {locale: "pt_BR", position: "right", type: "expanded_bubble",
-                               launcherTitle: lerVisual().botao || "Fale com a assistente"};
-    const s = document.createElement("script");
-    s.src = CHAT_URL + "/packs/js/sdk.js"; s.async = true;
-    s.onerror = chatIndisponivel;
-    s.onload = () => window.chatwootSDK ? window.chatwootSDK.run({websiteToken: token, baseUrl: CHAT_URL}) : chatIndisponivel();
-    document.body.appendChild(s);
+  // Avisa que o chat não carregou (token ausente ou script do chat fora do ar)
+  function avisarChatIndisponivel() {
+    mostrarAvisoChat("O chat ainda não está pronto; volte ao painel do kit e confira se tudo está ligado.");
   }
+
+  // Pergunta ao painel o token do site do chat; devolve "" se não conseguir
+  async function buscarTokenDoChat() {
+    // try/catch: se o painel estiver fora do ar, segue sem token e o aviso aparece depois
+    try {
+      const resposta = await fetch("/api/status");
+      const dados = await resposta.json();
+      return dados.website_token || "";
+    } catch (erro) {
+      return "";
+    }
+  }
+
+  // Carrega o script do Chatwoot e liga o balão (usa o texto do botão salvo, se houver)
+  async function ligarChat() {
+    const token = await buscarTokenDoChat();
+    if (!token) return avisarChatIndisponivel();
+
+    window.chatwootSettings = {
+      locale: "pt_BR",
+      position: "right",
+      type: "expanded_bubble",
+      launcherTitle: lerVisualSalvo().botao || TEXTO_PADRAO_BOTAO_CHAT
+    };
+
+    const script = document.createElement("script");
+    script.src = URL_DO_CHAT + "/packs/js/sdk.js";
+    script.async = true;
+    script.onerror = avisarChatIndisponivel;
+    script.onload = () => {
+      if (!window.chatwootSDK) return avisarChatIndisponivel();
+      window.chatwootSDK.run({websiteToken: token, baseUrl: URL_DO_CHAT});
+    };
+    document.body.appendChild(script);
+  }
+
+  // ===== Botões de copiar (seções 4 e 8) =====
+  // ⛔ o nome data-copiar nos botões (o script lê o texto que está nele)
+
+  // Copia o texto para a área de transferência; devolve uma Promise
+  function copiarTexto(texto) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(texto);
+    }
+    // Sem HTTPS a API moderna não existe: usa o método antigo (campo escondido + execCommand)
+    return new Promise((deuCerto, deuErrado) => {
+      const campo = document.createElement("textarea");
+      campo.value = texto;
+      campo.style.position = "fixed";
+      campo.style.opacity = "0";
+      document.body.appendChild(campo);
+      campo.select();
+      try {
+        if (document.execCommand("copy")) deuCerto();
+        else deuErrado();
+      } catch (erro) {
+        deuErrado(erro);
+      } finally {
+        campo.remove();
+      }
+    });
+  }
+
+  // Ao clicar num botão de copiar: copia, avisa o resultado e abre o chat
+  async function aoClicarCopiar(botao) {
+    let copiou = true;
+    // try/catch: o navegador pode negar o acesso à área de transferência
+    try {
+      await copiarTexto(botao.dataset.copiar);
+    } catch (erro) {
+      copiou = false;
+    }
+    porId("avisoCopia").textContent = copiou
+      ? "Copiado: cole no chat (Ctrl+V)."
+      : "Não consegui copiar: selecione e copie a frase à mão.";
+    abrirChatSePronto();
+  }
+
+  // Liga todos os elementos que têm data-copiar
+  function ligarBotoesDeCopiar() {
+    document.querySelectorAll("[data-copiar]").forEach(botao => {
+      botao.addEventListener("click", () => aoClicarCopiar(botao));
+    });
+  }
+
+  // ===== Início =====
+  iniciarCaraDoGrupo();
+  ligarBotoesDoChat();
+  ligarBotoesDeCopiar();
   ligarChat();
 })();
 </script>
